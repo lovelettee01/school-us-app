@@ -24,8 +24,8 @@ export function SearchPage() {
   const [schoolName, setSchoolName] = useState('');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
-  const { favorites, isFavorite, toggleFavorite } = useFavorites();
-  const { recents, pushRecent } = useRecents();
+  const { favorites, isFavorite, removeFavorite, toggleFavorite } = useFavorites();
+  const { recents, pushRecent, removeRecent } = useRecents();
   const { status, results, totalCount, errorMessage, search, reset } = useSchoolSearch();
 
   useErrorToast(status === 'error', errorMessage ?? '학교 검색 중 오류가 발생했습니다.');
@@ -71,8 +71,8 @@ export function SearchPage() {
       />
 
       <section className="grid gap-4 md:grid-cols-2">
-        <RecentSchools items={recents} />
-        <FavoriteSchools items={favorites} />
+        <RecentSchools items={recents} onRemove={removeRecent} />
+        <FavoriteSchools items={favorites} onRemove={removeFavorite} />
       </section>
 
       <section className="grid gap-3">

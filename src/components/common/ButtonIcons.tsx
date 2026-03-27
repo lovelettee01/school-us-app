@@ -75,6 +75,19 @@ export function MoreIcon(props: IconProps) {
   );
 }
 
+/** 휴지통 삭제 아이콘 */
+export function TrashIcon(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <path d="M4 7h16" />
+      <path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+      <path d="M7 7l1 12a1 1 0 0 0 1 .9h6a1 1 0 0 0 1-.9l1-12" />
+      <path d="M10 11v6" />
+      <path d="M14 11v6" />
+    </BaseIcon>
+  );
+}
+
 /** 재시도 아이콘 */
 export function RetryIcon(props: IconProps) {
   return (
