@@ -22,6 +22,7 @@ function getTodayYmd(): string {
  * 상세 탭2(급식) 콘텐츠를 렌더링한다.
  */
 export function MealTab({ detail }: MealTabProps) {
+  const todayYmd = getTodayYmd();
   const [fromYmd, setFromYmd] = useState<string>(() => getTodayYmd());
   const [toDateYmd, setToDateYmd] = useState<string>(() => getTodayYmd());
   const { status, items, errorMessage, fetchMeals } = useMeals();
@@ -92,7 +93,14 @@ export function MealTab({ detail }: MealTabProps) {
           {items.map((item) => (
             <article key={`${item.mealDate}-${item.mealType}`} className="card-surface p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 className="text-sm font-bold text-[var(--text)]">{item.mealDate}</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-bold text-[var(--text)]">{item.mealDate}</h3>
+                  {item.mealDate.replaceAll('-', '') === todayYmd ? (
+                    <span className="rounded-full bg-[var(--primary)] px-2 py-0.5 text-[10px] font-bold text-[var(--primary-contrast)]">
+                      TODAY
+                    </span>
+                  ) : null}
+                </div>
                 <span className="rounded-full bg-[var(--surface-muted)] px-2 py-1 text-xs text-[var(--text-muted)]">
                   {item.mealType}
                 </span>
