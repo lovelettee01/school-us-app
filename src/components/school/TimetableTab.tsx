@@ -34,6 +34,16 @@ function buildTimetableRows(items: TimetableItem[]) {
 }
 
 /**
+ * YYYY-MM-DD 문자열을 요일 라벨과 함께 표시한다.
+ */
+function formatDateWithWeekday(date: string): string {
+  const parsed = new Date(date);
+  const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+  const weekday = weekdays[parsed.getDay()] ?? '';
+  return `${date}(${weekday})`;
+}
+
+/**
  * 상세 탭3(시간표) 콘텐츠를 렌더링한다.
  */
 export function TimetableTab({ detail }: TimetableTabProps) {
@@ -168,7 +178,7 @@ export function TimetableTab({ detail }: TimetableTabProps) {
                 <th className="border border-[var(--border)] bg-[var(--surface-muted)] px-2 py-2">교시</th>
                 {table.dates.map((date) => (
                   <th key={date} className="border border-[var(--border)] bg-[var(--surface-muted)] px-2 py-2">
-                    {date}
+                    {formatDateWithWeekday(date)}
                   </th>
                 ))}
               </tr>
