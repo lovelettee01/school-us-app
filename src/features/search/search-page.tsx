@@ -15,12 +15,13 @@ import { useRecents } from '@/hooks/useRecents';
 import { useSchoolSearch } from '@/hooks/useSchoolSearch';
 
 const PAGE_SIZE = 10;
+const DEFAULT_OFFICE_CODE = 'B10';
 
 /**
  * 홈 검색 페이지 전체 상호작용을 오케스트레이션하는 클라이언트 컴포넌트다.
  */
 export function SearchPage() {
-  const [officeCode, setOfficeCode] = useState('');
+  const [officeCode, setOfficeCode] = useState(DEFAULT_OFFICE_CODE);
   const [schoolName, setSchoolName] = useState('');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
@@ -57,6 +58,7 @@ export function SearchPage() {
 
       <SchoolSearchForm
         officeCode={officeCode}
+        defaultOfficeCode={DEFAULT_OFFICE_CODE}
         schoolName={schoolName}
         onOfficeChange={setOfficeCode}
         onSchoolNameChange={setSchoolName}

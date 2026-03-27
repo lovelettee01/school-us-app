@@ -5,6 +5,7 @@ import { InlineFieldError } from '@/components/common/States';
 
 interface SchoolSearchFormProps {
   officeCode: string;
+  defaultOfficeCode: string;
   schoolName: string;
   onOfficeChange: (value: string) => void;
   onSchoolNameChange: (value: string) => void;
@@ -20,6 +21,7 @@ interface SchoolSearchFormProps {
  */
 export function SchoolSearchForm({
   officeCode,
+  defaultOfficeCode,
   schoolName,
   onOfficeChange,
   onSchoolNameChange,
@@ -33,7 +35,7 @@ export function SchoolSearchForm({
 
   return (
     <section className="card-surface p-4">
-      <div className="grid gap-3 md:grid-cols-[240px_1fr_auto_auto] md:items-end">
+      <div className="grid gap-3 md:grid-cols-[240px_1fr_auto] md:items-end">
         {officeSelect}
         <div className="grid gap-1">
           <label htmlFor="school-name" className="text-sm font-semibold text-[var(--text)]">
@@ -55,29 +57,31 @@ export function SchoolSearchForm({
           />
         </div>
 
-        <button
-          type="button"
-          onClick={onSubmit}
-          disabled={isLoading}
-          className="inline-flex min-h-9 items-center gap-1 rounded-xl bg-[var(--primary)] px-3 text-xs font-semibold text-[var(--primary-contrast)]"
-        >
-          <SearchIcon className="h-4 w-4" />
-          조회
-        </button>
+        <div className="grid grid-cols-2 gap-2 md:flex md:gap-2">
+          <button
+            type="button"
+            onClick={onSubmit}
+            disabled={isLoading}
+            className="inline-flex min-h-9 items-center justify-center gap-1 rounded-xl bg-[var(--primary)] px-3 text-xs font-semibold text-[var(--primary-contrast)]"
+          >
+            <SearchIcon className="h-4 w-4" />
+            조회
+          </button>
 
-        <button
-          type="button"
-          onClick={() => {
-            onOfficeChange('');
-            onSchoolNameChange('');
-            onReset();
-          }}
-          disabled={isLoading || (!officeCode && !schoolName)}
-          className="inline-flex min-h-9 items-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-xs font-semibold text-[var(--text)]"
-        >
-          <ResetIcon className="h-4 w-4" />
-          초기화
-        </button>
+          <button
+            type="button"
+            onClick={() => {
+              onOfficeChange(defaultOfficeCode);
+              onSchoolNameChange('');
+              onReset();
+            }}
+            disabled={isLoading || (officeCode === defaultOfficeCode && !schoolName)}
+            className="inline-flex min-h-9 items-center justify-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-xs font-semibold text-[var(--text)]"
+          >
+            <ResetIcon className="h-4 w-4" />
+            초기화
+          </button>
+        </div>
       </div>
       <InlineFieldError id={errorId} message={errorMessage} />
     </section>

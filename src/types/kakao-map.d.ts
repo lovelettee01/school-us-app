@@ -10,9 +10,16 @@ declare global {
         LatLng: new (lat: number, lng: number) => unknown;
         Map: new (container: HTMLElement, options: Record<string, unknown>) => {
           addControl: (control: unknown, position: unknown) => void;
+          setBounds: (bounds: unknown) => void;
         };
         Marker: new (options: Record<string, unknown>) => {
           setMap: (map: unknown) => void;
+        };
+        Polyline: new (options: Record<string, unknown>) => {
+          setMap: (map: unknown) => void;
+        };
+        LatLngBounds: new () => {
+          extend: (latLng: unknown) => void;
         };
         MapTypeControl: new () => unknown;
         ZoomControl: new () => unknown;

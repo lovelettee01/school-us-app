@@ -53,14 +53,11 @@ export function SchoolHeader({ detail, isFavorite, onToggleFavorite }: SchoolHea
       <dl className="grid gap-2 text-sm text-[var(--text-muted)] md:grid-cols-2">
         <div>
           <dt className="font-semibold text-[var(--text)]">도로명 주소</dt>
-          <dd>{detail.addressRoad || '정보 없음'}</dd>
+          <dd>
+            {detail.addressJibun ? `(${detail.addressJibun}) ` : ''}
+            {detail.addressRoad || '정보 없음'}
+          </dd>
         </div>
-        {detail.addressJibun ? (
-          <div>
-            <dt className="font-semibold text-[var(--text)]">지번 주소</dt>
-            <dd>{detail.addressJibun}</dd>
-          </div>
-        ) : null}
         {detail.tel ? (
           <div>
             <dt className="font-semibold text-[var(--text)]">전화번호</dt>

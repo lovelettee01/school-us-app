@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { KeyboardEvent } from 'react';
 
 import { InfoIcon, MealIcon, SearchIcon } from '@/components/common/ButtonIcons';
 import { EmptyState, ErrorState, LoadingState, RetryButton } from '@/components/common/States';
@@ -17,6 +18,14 @@ interface MealTabProps {
 interface ParsedMealLine {
   baseText: string;
   allergyCodes: string[];
+}
+
+/**
+ * 급식 아코디언 아이템의 안정적인 key를 생성한다.
+ * 날짜/식사구분/인덱스를 조합해 렌더링 순서가 바뀌어도 충돌을 줄인다.
+ */
+function makeMealItemKey(mealDate: string, mealType: string, index: number): string {
+  return `${mealDate}-${mealType}-${index}`;
 }
 
 /**
@@ -96,12 +105,26 @@ export function MealTab({ detail }: MealTabProps) {
 
   /**
    * 급식 결과 아코디언 항목의 열림/닫힘 상태를 토글한다.
+   * 기본 열림 항목(첫 번째)도 사용자가 클릭하면 정상적으로 닫을 수 있도록
+   * 현재 상태가 없을 때의 기본값을 함께 받아 반전한다.
    */
-  const toggleMealItem = (itemKey: string) => {
+  const toggleMealItem = (itemKey: string, defaultOpen: boolean = false) => {
     setOpenMealItems((prev) => ({
       ...prev,
-      [itemKey]: !prev[itemKey],
+      [itemKey]: !(prev[itemKey] ?? defaultOpen),
     }));
+  };
+
+  /**
+   * span 기반 상호작용 요소에서 Enter/Space 입력을 클릭과 동일하게 처리한다.
+   */
+  const handleAllergyGuideKeyDown = (event: KeyboardEvent<HTMLSpanElement>) => {
+    if (event.key !== 'Enter' && event.key !== ' ') {
+      return;
+    }
+
+    event.preventDefault();
+    setIsAllergyTooltipOpen((prev) => !prev);
   };
 
   return (
@@ -158,17 +181,24 @@ export function MealTab({ detail }: MealTabProps) {
       {status === 'success' ? (
         <section className="grid gap-3">
           <div className="relative flex justify-end">
-            <button
-              type="button"
+            <span
+              role="button"
+              tabIndex={0}
               aria-expanded={isAllergyTooltipOpen}
               aria-controls="meal-allergy-tooltip"
               onClick={() => setIsAllergyTooltipOpen((prev) => !prev)}
+              onKeyDown={handleAllergyGuideKeyDown}
               onBlur={() => setTimeout(() => setIsAllergyTooltipOpen(false), 150)}
-              className="inline-flex min-h-8 items-center gap-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 text-xs font-semibold text-[var(--text-muted)]"
+              className={[
+                'inline-flex cursor-pointer items-center gap-1 rounded-full px-2 py-1 text-xs transition',
+                isAllergyTooltipOpen
+                  ? 'bg-[var(--primary)] text-[var(--primary-contrast)]'
+                  : 'bg-[var(--surface-muted)] text-[var(--text-muted)]',
+              ].join(' ')}
             >
-              <InfoIcon className="h-3.5 w-3.5" />
+              <InfoIcon className="h-3.5 w-3.5 text-[var(--danger)]" />
               알레르기 가이드
-            </button>
+            </span>
 
             <div
               id="meal-allergy-tooltip"
@@ -191,8 +221,8 @@ export function MealTab({ detail }: MealTabProps) {
           </div>
 
           {sortedItems.map((item, index) => {
-            const itemKey = `${item.mealDate}-${item.mealType}-${index}`;
-            const isOpen = Boolean(openMealItems[itemKey]);
+            const itemKey = makeMealItemKey(item.mealDate, item.mealType, index);
+            const isOpen = openMealItems[itemKey] ?? index === 0;
 
             return (
               <article key={itemKey} className="card-surface p-4">
@@ -200,7 +230,7 @@ export function MealTab({ detail }: MealTabProps) {
                   type="button"
                   aria-expanded={isOpen}
                   aria-controls={`meal-item-panel-${itemKey}`}
-                  onClick={() => toggleMealItem(itemKey)}
+                  onClick={() => toggleMealItem(itemKey, index === 0)}
                   className="w-full cursor-pointer text-left"
                 >
                 <div className="flex flex-wrap items-center justify-between gap-2">

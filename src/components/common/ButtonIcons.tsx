@@ -206,6 +206,16 @@ export function CopyIcon(props: IconProps) {
   );
 }
 
+/** 닫기(X) 아이콘 */
+export function CloseIcon(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <path d="m6 6 12 12" />
+      <path d="m18 6-12 12" />
+    </BaseIcon>
+  );
+}
+
 /** 도보 아이콘 */
 export function WalkIcon(props: IconProps) {
   return (

@@ -13,7 +13,7 @@ interface TabsProps {
 }
 
 const TAB_ITEMS: Array<{ key: TabKey; label: string; icon: ComponentType<{ className?: string }> }> = [
-  { key: 'info', label: '학교정보/위치', icon: InfoIcon },
+  { key: 'info', label: '학교정보', icon: InfoIcon },
   { key: 'meal', label: '급식', icon: MealIcon },
   { key: 'timetable', label: '시간표', icon: TimetableIcon },
 ];

@@ -96,47 +96,44 @@ export function TimetableTab({ detail }: TimetableTabProps) {
 
   return (
     <div id="panel-timetable" role="tabpanel" aria-labelledby="tab-timetable" className="grid gap-3">
-      <section className="card-surface grid gap-3 p-4 md:grid-cols-5 md:items-end">
-        <div className="grid gap-1">
+      <section className="card-surface grid gap-3 p-4 md:grid-cols-4 md:items-end">
+        <div className="grid gap-1 md:col-span-2">
           <label htmlFor="time-mode-toggle" className="text-sm font-semibold text-[var(--text)]">
-            조회기준
+            조회기준일
           </label>
-          <button
-            id="time-mode-toggle"
-            type="button"
-            role="switch"
-            aria-checked={isWeeklyMode}
-            onClick={() => setIsWeeklyMode((prev) => !prev)}
-            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-xs font-semibold text-[var(--text)]"
-          >
-            <span
-              className={[
-                'inline-flex h-5 w-9 items-center rounded-full p-0.5 transition',
-                isWeeklyMode ? 'bg-[var(--primary)]' : 'bg-[var(--surface-muted)]',
-              ].join(' ')}
+          <div className="grid grid-cols-[auto_1fr] gap-2">
+            <button
+              id="time-mode-toggle"
+              type="button"
+              role="switch"
+              aria-checked={isWeeklyMode}
+              onClick={() => setIsWeeklyMode((prev) => !prev)}
+              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-xs font-semibold text-[var(--text)]"
             >
               <span
                 className={[
-                  'h-4 w-4 rounded-full bg-white transition',
-                  isWeeklyMode ? 'translate-x-4' : 'translate-x-0',
+                  'inline-flex h-5 w-9 items-center rounded-full p-0.5 transition',
+                  isWeeklyMode ? 'bg-[var(--primary)]' : 'bg-[var(--surface-muted)]',
                 ].join(' ')}
-              />
-            </span>
-            {isWeeklyMode ? '주간' : '일자'}
-          </button>
-        </div>
+              >
+                <span
+                  className={[
+                    'h-4 w-4 rounded-full bg-white transition',
+                    isWeeklyMode ? 'translate-x-4' : 'translate-x-0',
+                  ].join(' ')}
+                />
+              </span>
+              {isWeeklyMode ? '주간' : '일자'}
+            </button>
 
-        <div className="grid gap-1">
-          <label htmlFor="time-date" className="text-sm font-semibold text-[var(--text)]">
-            기준일
-          </label>
-          <input
-            id="time-date"
-            type="date"
-            value={baseDate}
-            onChange={(event) => setBaseDate(event.target.value)}
-            className="min-h-10 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-sm"
-          />
+            <input
+              id="time-date"
+              type="date"
+              value={baseDate}
+              onChange={(event) => setBaseDate(event.target.value)}
+              className="min-h-10 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-sm"
+            />
+          </div>
         </div>
 
         <div className="grid gap-1">

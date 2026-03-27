@@ -1,8 +1,9 @@
 ﻿'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import type { KeyboardEvent } from 'react';
 
-import { BikeIcon, CarIcon, CopyIcon, DistanceIcon, RouteIcon, WalkIcon } from '@/components/common/ButtonIcons';
+import { BikeIcon, CarIcon, CloseIcon, CopyIcon, DistanceIcon, RouteIcon, WalkIcon } from '@/components/common/ButtonIcons';
 import { buildKakaoRouteUrl } from '@/lib/kakao/route-link';
 import { calculateDistanceMeters, formatDistance } from '@/lib/kakao/distance';
 import { useCurrentLocation } from '@/hooks/useCurrentLocation';
@@ -12,6 +13,7 @@ import type { SchoolDetail } from '@/types/school';
 interface RouteDistancePanelProps {
   detail: SchoolDetail;
   targetPoint?: { lat: number; lng: number };
+  onLocationResolved?: (point: { lat: number; lng: number } | undefined) => void;
 }
 
 interface TravelTimeEstimate {
@@ -55,8 +57,9 @@ function formatDurationToHourMinute(totalMinutes: number): string {
 /**
  * 길찾기 링크와 현재 위치 기반 거리 계산 UI를 제공하는 패널이다.
  */
-export function RouteDistancePanel({ detail, targetPoint }: RouteDistancePanelProps) {
+export function RouteDistancePanel({ detail, targetPoint, onLocationResolved }: RouteDistancePanelProps) {
   const [routeError, setRouteError] = useState<string | undefined>(undefined);
+  const [isDistanceResultClosed, setIsDistanceResultClosed] = useState(false);
   const { status, location, errorMessage, requestLocation } = useCurrentLocation();
 
   useErrorToast(Boolean(errorMessage), errorMessage);
@@ -88,6 +91,24 @@ export function RouteDistancePanel({ detail, targetPoint }: RouteDistancePanelPr
       { key: 'car', title: '차량', minutes: distanceInfo.travelTime.carMinutes },
     ];
   }, [distanceInfo]);
+  const isDistanceResultVisible = Boolean(distanceInfo) && !isDistanceResultClosed;
+
+  /**
+   * 거리 계산용 현재 위치가 갱신될 때 부모 패널로 전달해
+   * 지도 컴포넌트에서 현재 위치 마커/경로선을 그릴 수 있게 한다.
+   */
+  useEffect(() => {
+    if (!onLocationResolved) {
+      return;
+    }
+
+    if (!location) {
+      onLocationResolved(undefined);
+      return;
+    }
+
+    onLocationResolved(location);
+  }, [location, onLocationResolved]);
 
   const handleOpenRoute = () => {
     setRouteError(undefined);
@@ -120,65 +141,147 @@ export function RouteDistancePanel({ detail, targetPoint }: RouteDistancePanelPr
     }
   };
 
+  /**
+   * 거리 계산 요청을 처리한다.
+   * 결과 카드가 열려 있는 동안에는 재조회하지 않고,
+   * 닫힌 상태에서만 기존 지도 오버레이를 초기화한 뒤 새 위치를 요청한다.
+   */
+  const handleRequestDistance = () => {
+    if (!targetPoint || status === 'loading') {
+      return;
+    }
+
+    if (isDistanceResultVisible) {
+      return;
+    }
+
+    onLocationResolved?.(undefined);
+    setIsDistanceResultClosed(false);
+    requestLocation();
+  };
+
+  /**
+   * 거리 계산 결과 카드를 닫고, 지도의 현재 위치 오버레이도 함께 숨긴다.
+   */
+  const handleCloseDistanceResult = () => {
+    setIsDistanceResultClosed(true);
+    onLocationResolved?.(undefined);
+  };
+
+  /**
+   * span 기반 상호작용 요소에서 Enter/Space 입력을 클릭과 동일하게 처리한다.
+   */
+  const handleActionKeyDown = (
+    event: KeyboardEvent<HTMLSpanElement>,
+    handler: () => void,
+    isDisabled: boolean = false,
+  ) => {
+    if (isDisabled) {
+      return;
+    }
+
+    if (event.key !== 'Enter' && event.key !== ' ') {
+      return;
+    }
+
+    event.preventDefault();
+    handler();
+  };
+
   return (
     <section className="grid gap-1.5" aria-live="polite">
       <div className="flex flex-wrap gap-2">
-        <button
-          type="button"
+        <span
+          role="button"
+          tabIndex={0}
           aria-label="길찾기 열기"
           title="길찾기 열기"
           onClick={handleOpenRoute}
-          className="inline-flex items-center gap-1 rounded-full border border-[var(--border)] bg-[var(--surface-muted)] px-2.5 py-1 text-xs font-semibold text-[var(--text)]"
+          onKeyDown={(event) => handleActionKeyDown(event, handleOpenRoute)}
+          className="inline-flex cursor-pointer items-center gap-1 rounded-full bg-[var(--surface-muted)] px-2 py-1 text-xs text-[var(--text-muted)] transition"
         >
           <RouteIcon className="h-3.5 w-3.5" /> 길찾기
-        </button>
+        </span>
 
-        <button
-          type="button"
+        <span
+          role="button"
+          tabIndex={0}
           aria-label="길찾기 링크 복사"
           title="길찾기 링크 복사"
           onClick={() => void handleCopyRouteLink()}
-          className="inline-flex items-center gap-1 rounded-full border border-[var(--border)] bg-[var(--surface-muted)] px-2.5 py-1 text-xs font-semibold text-[var(--text)]"
+          onKeyDown={(event) =>
+            handleActionKeyDown(event, () => {
+              void handleCopyRouteLink();
+            })
+          }
+          className="inline-flex cursor-pointer items-center gap-1 rounded-full bg-[var(--surface-muted)] px-2 py-1 text-xs text-[var(--text-muted)] transition"
         >
           <CopyIcon className="h-3.5 w-3.5" /> 링크복사
-        </button>
+        </span>
 
-        <button
-          type="button"
+        <span
+          role="button"
+          tabIndex={!targetPoint || status === 'loading' ? -1 : 0}
           aria-label={status === 'loading' ? '위치 확인 중' : '거리 계산'}
           title={status === 'loading' ? '위치 확인 중' : '거리 계산'}
-          onClick={requestLocation}
-          disabled={!targetPoint || status === 'loading'}
-          className="inline-flex items-center gap-1 rounded-full border border-[var(--border)] bg-[var(--surface-muted)] px-2.5 py-1 text-xs font-semibold text-[var(--text)]"
+          aria-disabled={!targetPoint || status === 'loading'}
+          onClick={handleRequestDistance}
+          onKeyDown={(event) =>
+            handleActionKeyDown(event, handleRequestDistance, !targetPoint || status === 'loading')
+          }
+          className={[
+            'inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs transition',
+            !targetPoint || status === 'loading'
+              ? 'cursor-not-allowed bg-[var(--surface-muted)] text-[var(--text-muted)]/60'
+              : isDistanceResultVisible
+                ? 'cursor-pointer bg-[var(--primary)] text-[var(--primary-contrast)]'
+                : 'cursor-pointer bg-[var(--surface-muted)] text-[var(--text-muted)]',
+          ].join(' ')}
         >
           <DistanceIcon className="h-3.5 w-3.5" /> 거리계산
-        </button>
+        </span>
       </div>
 
-      {distanceInfo ? (
-        <div className="grid gap-2">
-          <p className="text-sm text-[var(--success)]">현재 위치 기준 약 {distanceInfo.distanceText}</p>
+      {isDistanceResultVisible ? (
+        <section className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3">
+          <div className="mb-2 flex items-start justify-between gap-2">
+            <p className="text-xs text-[var(--success)]">현재 위치 기준 (직진 거리) 약 {distanceInfo?.distanceText}</p>
+            <button
+              type="button"
+              aria-label="거리 계산 결과 닫기"
+              onClick={handleCloseDistanceResult}
+              className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--surface-muted)] text-xs font-bold text-[var(--text-muted)]"
+            >
+              <CloseIcon className="h-3.5 w-3.5" />
+            </button>
+          </div>
           <div className="grid gap-2 sm:grid-cols-3">
             {travelTimeCards.map((item) => {
               const Icon = item.key === 'walk' ? WalkIcon : item.key === 'bike' ? BikeIcon : CarIcon;
+              const iconColorClass =
+                item.key === 'walk'
+                  ? 'text-red-500'
+                  : item.key === 'bike'
+                    ? 'text-yellow-500'
+                    : 'text-blue-500';
 
               return (
                 <article
                   key={item.key}
-                  className="rounded-xl border border-[var(--border)] bg-[var(--surface-muted)] p-3"
+                  className="rounded-lg border border-[var(--border)] bg-[var(--surface-muted)] p-2"
                 >
-                  <p className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--text)]">
-                    <Icon className="h-4 w-4" />
+                  <p className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--text)]">
+                    <Icon className={`h-3.5 w-3.5 ${iconColorClass}`} />
                     {item.title}
                   </p>
-                  <p className="mt-1 text-sm text-[var(--text-muted)]">
+                  <p className="mt-1 text-xs text-[var(--text-muted)]">
                     {formatDurationToHourMinute(item.minutes)}
                   </p>
                 </article>
               );
             })}
           </div>
-        </div>
+        </section>
       ) : null}
       {errorMessage ? <p className="text-sm text-[var(--warning)]">{errorMessage}</p> : null}
       {!targetPoint ? (
@@ -188,4 +291,3 @@ export function RouteDistancePanel({ detail, targetPoint }: RouteDistancePanelPr
     </section>
   );
 }
-
