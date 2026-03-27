@@ -30,7 +30,7 @@ export function ThemeToggle() {
           aria-pressed={mode === option.value}
           onClick={() => setMode(option.value)}
           className={[
-            'inline-flex min-h-10 min-w-10 items-center justify-center rounded-lg px-2 text-xs font-semibold transition',
+            'inline-flex min-h-9 min-w-9 items-center justify-center rounded-lg px-2 text-xs font-semibold transition',
             mode === option.value
               ? 'bg-[var(--primary)] text-[var(--primary-contrast)]'
               : 'bg-transparent text-[var(--text-muted)] hover:bg-[var(--surface-muted)]',

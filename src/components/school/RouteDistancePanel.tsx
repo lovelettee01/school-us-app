@@ -128,7 +128,7 @@ export function RouteDistancePanel({ detail, targetPoint }: RouteDistancePanelPr
           aria-label="길찾기 열기"
           title="길찾기 열기"
           onClick={handleOpenRoute}
-          className="inline-flex min-h-7 items-center justify-center gap-1 rounded-md bg-[var(--primary)] px-2 py-1 text-[11px] font-medium text-[var(--primary-contrast)]"
+          className="inline-flex items-center gap-1 rounded-full border border-[var(--border)] bg-[var(--surface-muted)] px-2.5 py-1 text-xs font-semibold text-[var(--text)]"
         >
           <RouteIcon className="h-3.5 w-3.5" /> 길찾기
         </button>
@@ -138,7 +138,7 @@ export function RouteDistancePanel({ detail, targetPoint }: RouteDistancePanelPr
           aria-label="길찾기 링크 복사"
           title="길찾기 링크 복사"
           onClick={() => void handleCopyRouteLink()}
-          className="inline-flex min-h-7 items-center justify-center gap-1 rounded-md border border-[var(--border)] px-2 py-1 text-[11px] font-medium text-[var(--text)]"
+          className="inline-flex items-center gap-1 rounded-full border border-[var(--border)] bg-[var(--surface-muted)] px-2.5 py-1 text-xs font-semibold text-[var(--text)]"
         >
           <CopyIcon className="h-3.5 w-3.5" /> 링크복사
         </button>
@@ -149,7 +149,7 @@ export function RouteDistancePanel({ detail, targetPoint }: RouteDistancePanelPr
           title={status === 'loading' ? '위치 확인 중' : '거리 계산'}
           onClick={requestLocation}
           disabled={!targetPoint || status === 'loading'}
-          className="inline-flex min-h-7 items-center justify-center gap-1 rounded-md border border-[var(--border)] px-2 py-1 text-[11px] font-medium text-[var(--text)]"
+          className="inline-flex items-center gap-1 rounded-full border border-[var(--border)] bg-[var(--surface-muted)] px-2.5 py-1 text-xs font-semibold text-[var(--text)]"
         >
           <DistanceIcon className="h-3.5 w-3.5" /> 거리계산
         </button>
@@ -188,3 +188,4 @@ export function RouteDistancePanel({ detail, targetPoint }: RouteDistancePanelPr
     </section>
   );
 }
+

@@ -59,7 +59,7 @@ export function SchoolSearchForm({
           type="button"
           onClick={onSubmit}
           disabled={isLoading}
-          className="inline-flex min-h-10 items-center gap-1 rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-[var(--primary-contrast)]"
+          className="inline-flex min-h-9 items-center gap-1 rounded-xl bg-[var(--primary)] px-3 text-xs font-semibold text-[var(--primary-contrast)]"
         >
           <SearchIcon className="h-4 w-4" />
           조회
@@ -73,7 +73,7 @@ export function SchoolSearchForm({
             onReset();
           }}
           disabled={isLoading || (!officeCode && !schoolName)}
-          className="inline-flex min-h-10 items-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 text-sm font-semibold text-[var(--text)]"
+          className="inline-flex min-h-9 items-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-xs font-semibold text-[var(--text)]"
         >
           <ResetIcon className="h-4 w-4" />
           초기화
@@ -83,4 +83,3 @@ export function SchoolSearchForm({
     </section>
   );
 }
-

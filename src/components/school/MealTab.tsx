@@ -135,7 +135,7 @@ export function MealTab({ detail }: MealTabProps) {
           type="button"
           onClick={() => void handleFetch()}
           disabled={status === 'loading'}
-          className="inline-flex min-h-10 items-center gap-1 rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-[var(--primary-contrast)]"
+          className="inline-flex min-h-9 items-center gap-1 rounded-xl bg-[var(--primary)] px-3 text-xs font-semibold text-[var(--primary-contrast)]"
         >
           <SearchIcon className="h-4 w-4" />
           조회
@@ -292,4 +292,5 @@ export function MealTab({ detail }: MealTabProps) {
     </div>
   );
 }
+
 

@@ -52,17 +52,19 @@ export function TimetableTab({ detail }: TimetableTabProps) {
   const level = resolveSchoolLevel(detail);
   const [grade, setGrade] = useState('');
   const [classNo, setClassNo] = useState('');
+  const [isWeeklyMode, setIsWeeklyMode] = useState<boolean>(true);
   const [baseDate, setBaseDate] = useState(() => new Date().toISOString().slice(0, 10));
   const { status, items, errorMessage, fetchTimetable } = useTimetable();
-
   useErrorToast(status === 'error', errorMessage ?? '시간표를 불러오지 못했습니다.');
 
   const weekRange = useMemo(() => {
     const parsed = new Date(baseDate);
     return getWeekRangeYmd(parsed);
   }, [baseDate]);
+  const baseDateYmd = useMemo(() => baseDate.replaceAll('-', ''), [baseDate]);
 
   const table = useMemo(() => buildTimetableRows(items), [items]);
+  const maxGrade = level === 'elementary' ? 6 : 3;
 
   const handleFetch = async () => {
     if (!level) {
@@ -79,8 +81,8 @@ export function TimetableTab({ detail }: TimetableTabProps) {
       schoolLevel: level,
       grade: Number(grade),
       classNo: Number(classNo),
-      fromYmd: weekRange.fromYmd,
-      toYmd: weekRange.toYmd,
+      fromYmd: isWeeklyMode ? weekRange.fromYmd : baseDateYmd,
+      toYmd: isWeeklyMode ? weekRange.toYmd : baseDateYmd,
     });
   };
 
@@ -94,7 +96,49 @@ export function TimetableTab({ detail }: TimetableTabProps) {
 
   return (
     <div id="panel-timetable" role="tabpanel" aria-labelledby="tab-timetable" className="grid gap-3">
-      <section className="card-surface grid gap-3 p-4 md:grid-cols-4 md:items-end">
+      <section className="card-surface grid gap-3 p-4 md:grid-cols-5 md:items-end">
+        <div className="grid gap-1">
+          <label htmlFor="time-mode-toggle" className="text-sm font-semibold text-[var(--text)]">
+            조회기준
+          </label>
+          <button
+            id="time-mode-toggle"
+            type="button"
+            role="switch"
+            aria-checked={isWeeklyMode}
+            onClick={() => setIsWeeklyMode((prev) => !prev)}
+            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-xs font-semibold text-[var(--text)]"
+          >
+            <span
+              className={[
+                'inline-flex h-5 w-9 items-center rounded-full p-0.5 transition',
+                isWeeklyMode ? 'bg-[var(--primary)]' : 'bg-[var(--surface-muted)]',
+              ].join(' ')}
+            >
+              <span
+                className={[
+                  'h-4 w-4 rounded-full bg-white transition',
+                  isWeeklyMode ? 'translate-x-4' : 'translate-x-0',
+                ].join(' ')}
+              />
+            </span>
+            {isWeeklyMode ? '주간' : '일자'}
+          </button>
+        </div>
+
+        <div className="grid gap-1">
+          <label htmlFor="time-date" className="text-sm font-semibold text-[var(--text)]">
+            기준일
+          </label>
+          <input
+            id="time-date"
+            type="date"
+            value={baseDate}
+            onChange={(event) => setBaseDate(event.target.value)}
+            className="min-h-10 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-sm"
+          />
+        </div>
+
         <div className="grid gap-1">
           <label htmlFor="time-grade" className="text-sm font-semibold text-[var(--text)]">
             학년
@@ -106,7 +150,7 @@ export function TimetableTab({ detail }: TimetableTabProps) {
             className="min-h-10 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-sm"
           >
             <option value="">선택</option>
-            {[1, 2, 3].map((value) => (
+            {Array.from({ length: maxGrade }, (_, index) => index + 1).map((value) => (
               <option key={value} value={value}>
                 {value}학년
               </option>
@@ -133,24 +177,11 @@ export function TimetableTab({ detail }: TimetableTabProps) {
           </select>
         </div>
 
-        <div className="grid gap-1">
-          <label htmlFor="time-date" className="text-sm font-semibold text-[var(--text)]">
-            기준일
-          </label>
-          <input
-            id="time-date"
-            type="date"
-            value={baseDate}
-            onChange={(event) => setBaseDate(event.target.value)}
-            className="min-h-10 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-sm"
-          />
-        </div>
-
         <button
           type="button"
           onClick={handleFetch}
           disabled={status === 'loading' || !grade || !classNo}
-          className="inline-flex min-h-10 items-center gap-1 rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-[var(--primary-contrast)]"
+          className="inline-flex min-h-9 items-center gap-1 rounded-xl bg-[var(--primary)] px-3 text-xs font-semibold text-[var(--primary-contrast)]"
         >
           <SearchIcon className="h-4 w-4" />
           조회
@@ -206,5 +237,6 @@ export function TimetableTab({ detail }: TimetableTabProps) {
     </div>
   );
 }
+
 
 

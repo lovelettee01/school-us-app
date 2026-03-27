@@ -50,7 +50,7 @@ export function Tabs({ activeTab, onChange }: TabsProps) {
           onClick={() => onChange(tab.key)}
           onKeyDown={(event) => handleKeyDown(event, index)}
           className={[
-            'inline-flex min-h-11 items-center justify-center gap-1 rounded-xl border px-3 py-2 text-sm font-semibold transition',
+            'inline-flex min-h-10 items-center justify-center gap-1 rounded-xl border px-3 py-2 text-xs font-semibold transition',
             activeTab === tab.key
               ? 'border-[var(--primary)] bg-[var(--primary)] text-[var(--primary-contrast)]'
               : 'border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)] hover:bg-[var(--surface-muted)]',
