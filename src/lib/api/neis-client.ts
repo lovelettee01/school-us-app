@@ -9,6 +9,22 @@ interface RequestOptions {
 }
 
 /**
+ * 로컬 테스트 편의를 위해 개발/테스트 환경에서만 TLS 검증 우회를 활성화한다.
+ * 운영 환경에서는 무시하여 보안 위험을 방지한다.
+ */
+function applyInsecureTlsForLocalTest(allowInsecureTls: boolean): void {
+  if (!allowInsecureTls) {
+    return;
+  }
+
+  if (process.env.NODE_ENV === 'production') {
+    return;
+  }
+
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+}
+
+/**
  * NEIS 쿼리 파라미터를 URLSearchParams로 변환한다.
  * undefined/null/빈문자열은 제외해 불필요한 파라미터 전송을 막는다.
  */
@@ -66,7 +82,9 @@ function extractResourceRows<T>(envelope: NeisApiEnvelope<T>, resource: string) 
  * NEIS API를 호출하고 공통 ApiResult 형태로 반환한다.
  */
 export async function requestNeis<T>(options: RequestOptions): Promise<ApiResult<T[]>> {
-  const { neisApiKey, neisBaseUrl } = getServerEnv();
+  const { neisApiKey, neisBaseUrl, neisAllowInsecureTls } = getServerEnv();
+
+  applyInsecureTlsForLocalTest(neisAllowInsecureTls);
 
   if (!neisApiKey) {
     return createFailure('UPSTREAM_ERROR', 'NEIS API 키가 설정되지 않았습니다.');

@@ -3,9 +3,12 @@
  * 값이 없을 때는 빈 문자열을 반환하여 런타임에서 사용자 친화 오류로 처리할 수 있게 한다.
  */
 export function getServerEnv() {
+  const neisAllowInsecureTls = process.env.NEIS_API_ALLOW_INSECURE_TLS === 'true';
+
   return {
     neisApiKey: process.env.NEIS_API_KEY ?? '',
     neisBaseUrl: process.env.NEIS_API_BASE_URL ?? 'https://open.neis.go.kr/hub',
+    neisAllowInsecureTls,
   };
 }
 
