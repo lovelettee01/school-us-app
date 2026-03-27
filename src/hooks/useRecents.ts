@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { getPublicEnv } from '@/lib/env';
 import { readRecents, writeRecents } from '@/lib/storage/recents';
@@ -13,23 +13,26 @@ export function useRecents() {
   const [recents, setRecents] = useState<RecentSchool[]>(() => readRecents());
   const { recentMaxCount } = getPublicEnv();
 
-  const pushRecent = (school: SchoolSummary) => {
-    setRecents((prev) => {
-      const deduped = prev.filter((item) => item.schoolKey !== school.schoolKey);
-      const next = [
-        {
-          schoolKey: school.schoolKey,
-          schoolName: school.schoolName,
-          officeName: school.officeName,
-          viewedAt: new Date().toISOString(),
-        },
-        ...deduped,
-      ].slice(0, Math.max(1, recentMaxCount));
+  const pushRecent = useCallback(
+    (school: SchoolSummary) => {
+      setRecents((prev) => {
+        const deduped = prev.filter((item) => item.schoolKey !== school.schoolKey);
+        const next = [
+          {
+            schoolKey: school.schoolKey,
+            schoolName: school.schoolName,
+            officeName: school.officeName,
+            viewedAt: new Date().toISOString(),
+          },
+          ...deduped,
+        ].slice(0, Math.max(1, recentMaxCount));
 
-      writeRecents(next);
-      return next;
-    });
-  };
+        writeRecents(next);
+        return next;
+      });
+    },
+    [recentMaxCount],
+  );
 
   return {
     recents,
