@@ -1,5 +1,6 @@
 ﻿import type { ReactNode } from 'react';
 
+import { ResetIcon, SearchIcon } from '@/components/common/ButtonIcons';
 import { InlineFieldError } from '@/components/common/States';
 
 interface SchoolSearchFormProps {
@@ -50,7 +51,7 @@ export function SchoolSearchForm({
             }}
             aria-describedby={errorMessage ? errorId : undefined}
             placeholder="학교명을 2글자 이상 입력해 주세요"
-            className="min-h-11 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
+            className="min-h-10 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
           />
         </div>
 
@@ -58,8 +59,9 @@ export function SchoolSearchForm({
           type="button"
           onClick={onSubmit}
           disabled={isLoading}
-          className="min-h-11 rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-[var(--primary-contrast)]"
+          className="inline-flex min-h-10 items-center gap-1 rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-[var(--primary-contrast)]"
         >
+          <SearchIcon className="h-4 w-4" />
           조회
         </button>
 
@@ -71,8 +73,9 @@ export function SchoolSearchForm({
             onReset();
           }}
           disabled={isLoading || (!officeCode && !schoolName)}
-          className="min-h-11 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 text-sm font-semibold text-[var(--text)]"
+          className="inline-flex min-h-10 items-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 text-sm font-semibold text-[var(--text)]"
         >
+          <ResetIcon className="h-4 w-4" />
           초기화
         </button>
       </div>
@@ -80,3 +83,4 @@ export function SchoolSearchForm({
     </section>
   );
 }
+

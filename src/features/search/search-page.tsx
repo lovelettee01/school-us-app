@@ -9,6 +9,7 @@ import { OfficeSelect } from '@/components/search/OfficeSelect';
 import { RecentSchools } from '@/components/search/RecentSchools';
 import { SchoolList } from '@/components/search/SchoolList';
 import { SchoolSearchForm } from '@/components/search/SchoolSearchForm';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useRecents } from '@/hooks/useRecents';
 import { useSchoolSearch } from '@/hooks/useSchoolSearch';
@@ -26,6 +27,8 @@ export function SearchPage() {
   const { favorites, isFavorite, toggleFavorite } = useFavorites();
   const { recents, pushRecent } = useRecents();
   const { status, results, totalCount, errorMessage, search, reset } = useSchoolSearch();
+
+  useErrorToast(status === 'error', errorMessage ?? '학교 검색 중 오류가 발생했습니다.');
 
   const hasMore = results.length > visibleCount;
 

@@ -2,7 +2,9 @@
 
 import { useMemo, useState } from 'react';
 
+import { SearchIcon } from '@/components/common/ButtonIcons';
 import { EmptyState, ErrorState, LoadingState, RetryButton } from '@/components/common/States';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import { useTimetable } from '@/hooks/useTimetable';
 import { getWeekRangeYmd } from '@/lib/utils/date';
 import { resolveSchoolLevel } from '@/lib/utils/school-level';
@@ -53,6 +55,8 @@ export function TimetableTab({ detail }: TimetableTabProps) {
   const [baseDate, setBaseDate] = useState(() => new Date().toISOString().slice(0, 10));
   const { status, items, errorMessage, fetchTimetable } = useTimetable();
 
+  useErrorToast(status === 'error', errorMessage ?? '시간표를 불러오지 못했습니다.');
+
   const weekRange = useMemo(() => {
     const parsed = new Date(baseDate);
     return getWeekRangeYmd(parsed);
@@ -99,7 +103,7 @@ export function TimetableTab({ detail }: TimetableTabProps) {
             id="time-grade"
             value={grade}
             onChange={(event) => setGrade(event.target.value)}
-            className="min-h-11 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-sm"
+            className="min-h-10 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-sm"
           >
             <option value="">선택</option>
             {[1, 2, 3].map((value) => (
@@ -118,7 +122,7 @@ export function TimetableTab({ detail }: TimetableTabProps) {
             id="time-class"
             value={classNo}
             onChange={(event) => setClassNo(event.target.value)}
-            className="min-h-11 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-sm"
+            className="min-h-10 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-sm"
           >
             <option value="">선택</option>
             {Array.from({ length: 20 }, (_, index) => index + 1).map((value) => (
@@ -138,7 +142,7 @@ export function TimetableTab({ detail }: TimetableTabProps) {
             type="date"
             value={baseDate}
             onChange={(event) => setBaseDate(event.target.value)}
-            className="min-h-11 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-sm"
+            className="min-h-10 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-sm"
           />
         </div>
 
@@ -146,8 +150,9 @@ export function TimetableTab({ detail }: TimetableTabProps) {
           type="button"
           onClick={handleFetch}
           disabled={status === 'loading' || !grade || !classNo}
-          className="min-h-11 rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-[var(--primary-contrast)]"
+          className="inline-flex min-h-10 items-center gap-1 rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-[var(--primary-contrast)]"
         >
+          <SearchIcon className="h-4 w-4" />
           조회
         </button>
       </section>
@@ -201,3 +206,5 @@ export function TimetableTab({ detail }: TimetableTabProps) {
     </div>
   );
 }
+
+

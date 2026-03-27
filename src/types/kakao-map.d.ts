@@ -8,9 +8,17 @@ declare global {
       maps: {
         load: (callback: () => void) => void;
         LatLng: new (lat: number, lng: number) => unknown;
-        Map: new (container: HTMLElement, options: Record<string, unknown>) => unknown;
+        Map: new (container: HTMLElement, options: Record<string, unknown>) => {
+          addControl: (control: unknown, position: unknown) => void;
+        };
         Marker: new (options: Record<string, unknown>) => {
           setMap: (map: unknown) => void;
+        };
+        MapTypeControl: new () => unknown;
+        ZoomControl: new () => unknown;
+        ControlPosition: {
+          TOPRIGHT: unknown;
+          RIGHT: unknown;
         };
         services: {
           Geocoder: new () => {

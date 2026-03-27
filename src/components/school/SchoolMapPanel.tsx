@@ -1,23 +1,29 @@
 ﻿'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 
+import { CopyIcon } from '@/components/common/ButtonIcons';
 import { ErrorState, RetryButton } from '@/components/common/States';
 import { loadKakaoMapSdk } from '@/lib/kakao/map-loader';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import type { SchoolDetail } from '@/types/school';
 
 interface SchoolMapPanelProps {
   detail: SchoolDetail;
   onResolvedPoint: (point: { lat: number; lng: number } | undefined) => void;
+  children?: ReactNode;
 }
 
 /**
  * 카카오 지도 SDK를 로드하고 학교 위치를 지도에 렌더링하는 컴포넌트다.
  */
-export function SchoolMapPanel({ detail, onResolvedPoint }: SchoolMapPanelProps) {
+export function SchoolMapPanel({ detail, onResolvedPoint, children }: SchoolMapPanelProps) {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error' | 'empty'>('loading');
   const [message, setMessage] = useState<string>('지도를 불러오는 중입니다.');
+
+  useErrorToast(status === 'error', message);
 
   const initialPoint = useMemo(
     () =>
@@ -49,6 +55,8 @@ export function SchoolMapPanel({ detail, onResolvedPoint }: SchoolMapPanelProps)
           center: kakaoCenter,
           level: 3,
         });
+        map.addControl(new window.kakao.maps.MapTypeControl(), window.kakao.maps.ControlPosition.TOPRIGHT);
+        map.addControl(new window.kakao.maps.ZoomControl(), window.kakao.maps.ControlPosition.RIGHT);
 
         const marker = new window.kakao.maps.Marker({ position: kakaoCenter });
         marker.setMap(map);
@@ -85,6 +93,8 @@ export function SchoolMapPanel({ detail, onResolvedPoint }: SchoolMapPanelProps)
           center: kakaoCenter,
           level: 3,
         });
+        map.addControl(new window.kakao.maps.MapTypeControl(), window.kakao.maps.ControlPosition.TOPRIGHT);
+        map.addControl(new window.kakao.maps.ZoomControl(), window.kakao.maps.ControlPosition.RIGHT);
 
         const marker = new window.kakao.maps.Marker({ position: kakaoCenter });
         marker.setMap(map);
@@ -114,7 +124,9 @@ export function SchoolMapPanel({ detail, onResolvedPoint }: SchoolMapPanelProps)
     };
 
     return (
-      <div className="grid gap-2">
+      <section className="card-surface grid gap-2 p-4" aria-live="polite">
+        <h3 className="text-sm font-bold text-[var(--text)]">학교 위치</h3>
+        <p className="text-sm text-[var(--text-muted)]">{detail.addressRoad || '주소 정보 없음'}</p>
         <ErrorState
           message={message}
           retry={<RetryButton onRetry={() => void renderMap()} label="다시 시도" />}
@@ -123,12 +135,14 @@ export function SchoolMapPanel({ detail, onResolvedPoint }: SchoolMapPanelProps)
           <button
             type="button"
             onClick={() => void copyAddress()}
-            className="min-h-11 w-fit rounded-xl border border-[var(--border)] px-4 text-sm font-semibold text-[var(--text)]"
+            className="inline-flex min-h-10 w-fit items-center gap-1 rounded-xl border border-[var(--border)] px-4 text-sm font-semibold text-[var(--text)]"
           >
+            <CopyIcon className="h-4 w-4" />
             주소 복사
           </button>
         ) : null}
-      </div>
+        {children ? <div className="mt-2 border-t border-[var(--border)] pt-3">{children}</div> : null}
+      </section>
     );
   }
 
@@ -143,14 +157,18 @@ export function SchoolMapPanel({ detail, onResolvedPoint }: SchoolMapPanelProps)
             <button
               type="button"
               onClick={() => void navigator.clipboard.writeText(detail.addressRoad)}
-              className="min-h-11 w-fit rounded-xl border border-[var(--border)] px-4 text-sm font-semibold text-[var(--text)]"
+              className="inline-flex min-h-10 w-fit items-center gap-1 rounded-xl border border-[var(--border)] px-4 text-sm font-semibold text-[var(--text)]"
             >
+              <CopyIcon className="h-4 w-4" />
               주소 복사
             </button>
           ) : null}
         </div>
       ) : null}
+      {children ? <div className="mt-1 border-b border-[var(--border)] pb-2">{children}</div> : null}
       <div ref={mapRef} className="h-[260px] w-full rounded-xl border border-[var(--border)] bg-[var(--surface-muted)] md:h-[340px]" />
     </section>
   );
 }
+
+

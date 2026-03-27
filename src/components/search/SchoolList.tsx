@@ -1,4 +1,5 @@
-﻿import { SchoolCard } from '@/components/search/SchoolCard';
+﻿import { MoreIcon } from '@/components/common/ButtonIcons';
+import { SchoolCard } from '@/components/search/SchoolCard';
 import type { SchoolSummary } from '@/types/school';
 
 interface SchoolListProps {
@@ -39,11 +40,13 @@ export function SchoolList({
         <button
           type="button"
           onClick={onMore}
-          className="min-h-11 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 text-sm font-semibold text-[var(--text)]"
+          className="inline-flex min-h-10 items-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 text-sm font-semibold text-[var(--text)]"
         >
+          <MoreIcon className="h-4 w-4" />
           더보기
         </button>
       ) : null}
     </section>
   );
 }
+

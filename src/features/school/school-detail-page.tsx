@@ -10,6 +10,7 @@ import { MealTab } from '@/components/school/MealTab';
 import { SchoolHeader } from '@/components/school/SchoolHeader';
 import { SchoolInfoTab } from '@/components/school/SchoolInfoTab';
 import { TimetableTab } from '@/components/school/TimetableTab';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useRecents } from '@/hooks/useRecents';
 import { useSchoolDetail } from '@/hooks/useSchoolDetail';
@@ -36,6 +37,8 @@ export function SchoolDetailPage({ schoolKey }: SchoolDetailPageProps) {
   const { status, detail, errorMessage, retry } = useSchoolDetail(schoolKey);
   const { isFavorite, toggleFavorite } = useFavorites();
   const { pushRecent } = useRecents();
+
+  useErrorToast(status === 'error', errorMessage ?? '학교 정보를 불러오지 못했습니다.');
 
   const activePanel = useMemo(() => {
     if (!detail) {

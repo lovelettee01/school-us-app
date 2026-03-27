@@ -2,14 +2,54 @@
 
 import { useMemo, useState } from 'react';
 
+import { BikeIcon, CarIcon, CopyIcon, DistanceIcon, RouteIcon, WalkIcon } from '@/components/common/ButtonIcons';
 import { buildKakaoRouteUrl } from '@/lib/kakao/route-link';
 import { calculateDistanceMeters, formatDistance } from '@/lib/kakao/distance';
 import { useCurrentLocation } from '@/hooks/useCurrentLocation';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import type { SchoolDetail } from '@/types/school';
 
 interface RouteDistancePanelProps {
   detail: SchoolDetail;
   targetPoint?: { lat: number; lng: number };
+}
+
+interface TravelTimeEstimate {
+  walkMinutes: number;
+  bikeMinutes: number;
+  carMinutes: number;
+}
+
+interface TravelTimeCardItem {
+  key: 'walk' | 'bike' | 'car';
+  title: string;
+  minutes: number;
+}
+
+/**
+ * 거리(m)를 기반으로 이동수단별 예상 소요 시간(분)을 계산한다.
+ * 도보 4.5km/h, 자전거 16km/h, 차량 35km/h를 기준 속도로 사용한다.
+ */
+function calculateTravelTimeEstimate(distanceMeters: number): TravelTimeEstimate {
+  const walkMetersPerMinute = 4500 / 60;
+  const bikeMetersPerMinute = 16000 / 60;
+  const carMetersPerMinute = 35000 / 60;
+
+  return {
+    walkMinutes: Math.max(1, Math.round(distanceMeters / walkMetersPerMinute)),
+    bikeMinutes: Math.max(1, Math.round(distanceMeters / bikeMetersPerMinute)),
+    carMinutes: Math.max(1, Math.round(distanceMeters / carMetersPerMinute)),
+  };
+}
+
+/**
+ * 분 단위 시간을 "n시간 m분" 형식으로 변환한다.
+ * 예: 135 -> "2시간 15분", 18 -> "0시간 18분"
+ */
+function formatDurationToHourMinute(totalMinutes: number): string {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${hours}시간 ${minutes}분`;
 }
 
 /**
@@ -19,14 +59,35 @@ export function RouteDistancePanel({ detail, targetPoint }: RouteDistancePanelPr
   const [routeError, setRouteError] = useState<string | undefined>(undefined);
   const { status, location, errorMessage, requestLocation } = useCurrentLocation();
 
-  const distanceText = useMemo(() => {
+  useErrorToast(Boolean(errorMessage), errorMessage);
+  useErrorToast(Boolean(routeError), routeError);
+
+  const distanceInfo = useMemo(() => {
     if (!location || !targetPoint) {
       return null;
     }
 
     const meters = calculateDistanceMeters(location, targetPoint);
-    return formatDistance(meters);
+    return {
+      distanceText: formatDistance(meters),
+      travelTime: calculateTravelTimeEstimate(meters),
+    };
   }, [location, targetPoint]);
+
+  /**
+   * 계산된 이동수단별 시간을 카드 렌더링에 필요한 배열 형태로 만든다.
+   */
+  const travelTimeCards = useMemo<TravelTimeCardItem[]>(() => {
+    if (!distanceInfo) {
+      return [];
+    }
+
+    return [
+      { key: 'walk', title: '도보', minutes: distanceInfo.travelTime.walkMinutes },
+      { key: 'bike', title: '자전거', minutes: distanceInfo.travelTime.bikeMinutes },
+      { key: 'car', title: '차량', minutes: distanceInfo.travelTime.carMinutes },
+    ];
+  }, [distanceInfo]);
 
   const handleOpenRoute = () => {
     setRouteError(undefined);
@@ -60,41 +121,70 @@ export function RouteDistancePanel({ detail, targetPoint }: RouteDistancePanelPr
   };
 
   return (
-    <section className="card-surface grid gap-2 p-4" aria-live="polite">
-      <h3 className="text-sm font-bold text-[var(--text)]">길찾기/거리</h3>
-
+    <section className="grid gap-1.5" aria-live="polite">
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
+          aria-label="길찾기 열기"
+          title="길찾기 열기"
           onClick={handleOpenRoute}
-          className="min-h-11 rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-[var(--primary-contrast)]"
+          className="inline-flex min-h-7 items-center justify-center gap-1 rounded-md bg-[var(--primary)] px-2 py-1 text-[11px] font-medium text-[var(--primary-contrast)]"
         >
-          길찾기 열기
+          <RouteIcon className="h-3.5 w-3.5" /> 길찾기
         </button>
 
         <button
           type="button"
+          aria-label="길찾기 링크 복사"
+          title="길찾기 링크 복사"
+          onClick={() => void handleCopyRouteLink()}
+          className="inline-flex min-h-7 items-center justify-center gap-1 rounded-md border border-[var(--border)] px-2 py-1 text-[11px] font-medium text-[var(--text)]"
+        >
+          <CopyIcon className="h-3.5 w-3.5" /> 링크복사
+        </button>
+
+        <button
+          type="button"
+          aria-label={status === 'loading' ? '위치 확인 중' : '거리 계산'}
+          title={status === 'loading' ? '위치 확인 중' : '거리 계산'}
           onClick={requestLocation}
           disabled={!targetPoint || status === 'loading'}
-          className="min-h-11 rounded-xl border border-[var(--border)] px-4 text-sm font-semibold text-[var(--text)]"
+          className="inline-flex min-h-7 items-center justify-center gap-1 rounded-md border border-[var(--border)] px-2 py-1 text-[11px] font-medium text-[var(--text)]"
         >
-          {status === 'loading' ? '위치 확인 중...' : '거리 계산'}
+          <DistanceIcon className="h-3.5 w-3.5" /> 거리계산
         </button>
       </div>
 
-      {distanceText ? <p className="text-sm text-[var(--success)]">현재 위치 기준 약 {distanceText}</p> : null}
+      {distanceInfo ? (
+        <div className="grid gap-2">
+          <p className="text-sm text-[var(--success)]">현재 위치 기준 약 {distanceInfo.distanceText}</p>
+          <div className="grid gap-2 sm:grid-cols-3">
+            {travelTimeCards.map((item) => {
+              const Icon = item.key === 'walk' ? WalkIcon : item.key === 'bike' ? BikeIcon : CarIcon;
+
+              return (
+                <article
+                  key={item.key}
+                  className="rounded-xl border border-[var(--border)] bg-[var(--surface-muted)] p-3"
+                >
+                  <p className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--text)]">
+                    <Icon className="h-4 w-4" />
+                    {item.title}
+                  </p>
+                  <p className="mt-1 text-sm text-[var(--text-muted)]">
+                    {formatDurationToHourMinute(item.minutes)}
+                  </p>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
       {errorMessage ? <p className="text-sm text-[var(--warning)]">{errorMessage}</p> : null}
       {!targetPoint ? (
         <p className="text-sm text-[var(--warning)]">학교 좌표가 없어 거리 계산을 사용할 수 없습니다.</p>
       ) : null}
       {routeError ? <p className="text-sm text-[var(--danger)]">{routeError}</p> : null}
-      <button
-        type="button"
-        onClick={() => void handleCopyRouteLink()}
-        className="min-h-11 w-fit rounded-xl border border-[var(--border)] px-4 text-sm font-semibold text-[var(--text)]"
-      >
-        길찾기 링크 복사
-      </button>
     </section>
   );
 }

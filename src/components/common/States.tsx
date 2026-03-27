@@ -1,5 +1,7 @@
 ﻿import { ReactNode } from 'react';
 
+import { RetryIcon } from '@/components/common/ButtonIcons';
+
 interface LoadingStateProps {
   title?: string;
   description?: string;
@@ -111,9 +113,11 @@ export function RetryButton({ onRetry, label = '다시 시도' }: RetryButtonPro
     <button
       type="button"
       onClick={onRetry}
-      className="min-h-11 rounded-lg border border-[var(--border)] px-4 text-sm font-semibold text-[var(--text)] hover:bg-[var(--surface-muted)]"
+      className="inline-flex min-h-10 items-center gap-1 rounded-lg border border-[var(--border)] px-4 text-sm font-semibold text-[var(--text)] hover:bg-[var(--surface-muted)]"
     >
+      <RetryIcon className="h-4 w-4" />
       {label}
     </button>
   );
 }
+

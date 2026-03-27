@@ -1,6 +1,9 @@
 ﻿'use client';
 
 import { KeyboardEvent } from 'react';
+import type { ComponentType } from 'react';
+
+import { InfoIcon, MealIcon, TimetableIcon } from '@/components/common/ButtonIcons';
 
 export type TabKey = 'info' | 'meal' | 'timetable';
 
@@ -9,10 +12,10 @@ interface TabsProps {
   onChange: (tab: TabKey) => void;
 }
 
-const TAB_ITEMS: Array<{ key: TabKey; label: string }> = [
-  { key: 'info', label: '학교정보/위치' },
-  { key: 'meal', label: '급식' },
-  { key: 'timetable', label: '시간표' },
+const TAB_ITEMS: Array<{ key: TabKey; label: string; icon: ComponentType<{ className?: string }> }> = [
+  { key: 'info', label: '학교정보/위치', icon: InfoIcon },
+  { key: 'meal', label: '급식', icon: MealIcon },
+  { key: 'timetable', label: '시간표', icon: TimetableIcon },
 ];
 
 /**
@@ -47,12 +50,13 @@ export function Tabs({ activeTab, onChange }: TabsProps) {
           onClick={() => onChange(tab.key)}
           onKeyDown={(event) => handleKeyDown(event, index)}
           className={[
-            'min-h-11 rounded-xl border px-3 py-2 text-sm font-semibold transition',
+            'inline-flex min-h-11 items-center justify-center gap-1 rounded-xl border px-3 py-2 text-sm font-semibold transition',
             activeTab === tab.key
               ? 'border-[var(--primary)] bg-[var(--primary)] text-[var(--primary-contrast)]'
               : 'border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)] hover:bg-[var(--surface-muted)]',
           ].join(' ')}
         >
+          <tab.icon className="h-4 w-4" />
           {tab.label}
         </button>
       ))}

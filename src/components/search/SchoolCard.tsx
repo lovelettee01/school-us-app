@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 
+import { DetailIcon, StarIcon } from '@/components/common/ButtonIcons';
 import type { SchoolSummary } from '@/types/school';
 
 interface SchoolCardProps {
@@ -32,16 +33,24 @@ export function SchoolCard({ school, isFavorite, onFavoriteToggle, onBeforeNavig
         <Link
           href={`/school/${school.schoolKey}`}
           onClick={() => onBeforeNavigate(school)}
-          className="min-h-11 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-[var(--primary-contrast)]"
+          className="inline-flex min-h-10 items-center gap-1 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-[var(--primary-contrast)]"
         >
+          <DetailIcon className="h-4 w-4" />
           상세 보기
         </Link>
         <button
           type="button"
           onClick={() => onFavoriteToggle(school)}
-          className="min-h-11 rounded-xl border border-[var(--border)] px-4 text-sm font-semibold text-[var(--text)]"
+          aria-label={isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
+          title={isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
+          className={[
+            'inline-flex min-h-10 min-w-10 items-center justify-center rounded-xl border px-2 text-sm font-semibold',
+            isFavorite
+              ? 'border-amber-300 bg-amber-50 text-amber-600'
+              : 'border-[var(--border)] bg-[var(--surface)] text-[var(--text)]',
+          ].join(' ')}
         >
-          {isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
+          <StarIcon className="h-4 w-4" filled={isFavorite} />
         </button>
       </div>
     </article>
