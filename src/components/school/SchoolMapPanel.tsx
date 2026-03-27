@@ -105,11 +105,30 @@ export function SchoolMapPanel({ detail, onResolvedPoint }: SchoolMapPanelProps)
   }, [detail.schoolKey, renderMap]);
 
   if (status === 'error') {
+    const copyAddress = async () => {
+      try {
+        await navigator.clipboard.writeText(detail.addressRoad);
+      } catch {
+        // 복사 실패는 치명적 오류가 아니므로 무시한다.
+      }
+    };
+
     return (
-      <ErrorState
-        message={message}
-        retry={<RetryButton onRetry={() => void renderMap()} label="다시 시도" />}
-      />
+      <div className="grid gap-2">
+        <ErrorState
+          message={message}
+          retry={<RetryButton onRetry={() => void renderMap()} label="다시 시도" />}
+        />
+        {detail.addressRoad ? (
+          <button
+            type="button"
+            onClick={() => void copyAddress()}
+            className="min-h-11 w-fit rounded-xl border border-[var(--border)] px-4 text-sm font-semibold text-[var(--text)]"
+          >
+            주소 복사
+          </button>
+        ) : null}
+      </div>
     );
   }
 
@@ -117,7 +136,20 @@ export function SchoolMapPanel({ detail, onResolvedPoint }: SchoolMapPanelProps)
     <section className="card-surface grid gap-2 p-4" aria-live="polite">
       <h3 className="text-sm font-bold text-[var(--text)]">학교 위치</h3>
       <p className="text-sm text-[var(--text-muted)]">{detail.addressRoad || '주소 정보 없음'}</p>
-      {status === 'empty' ? <p className="text-sm text-[var(--warning)]">{message}</p> : null}
+      {status === 'empty' ? (
+        <div className="grid gap-2">
+          <p className="text-sm text-[var(--warning)]">{message}</p>
+          {detail.addressRoad ? (
+            <button
+              type="button"
+              onClick={() => void navigator.clipboard.writeText(detail.addressRoad)}
+              className="min-h-11 w-fit rounded-xl border border-[var(--border)] px-4 text-sm font-semibold text-[var(--text)]"
+            >
+              주소 복사
+            </button>
+          ) : null}
+        </div>
+      ) : null}
       <div ref={mapRef} className="h-[260px] w-full rounded-xl border border-[var(--border)] bg-[var(--surface-muted)] md:h-[340px]" />
     </section>
   );

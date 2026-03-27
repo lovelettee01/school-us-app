@@ -43,6 +43,22 @@ export function RouteDistancePanel({ detail, targetPoint }: RouteDistancePanelPr
     }
   };
 
+  const handleCopyRouteLink = async () => {
+    const url = buildKakaoRouteUrl({
+      schoolName: detail.schoolName,
+      lat: targetPoint?.lat,
+      lng: targetPoint?.lng,
+      addressRoad: detail.addressRoad,
+    });
+
+    try {
+      await navigator.clipboard.writeText(url);
+      setRouteError('길찾기 링크를 복사했습니다.');
+    } catch {
+      setRouteError('링크 복사에 실패했습니다. 다시 시도해 주세요.');
+    }
+  };
+
   return (
     <section className="card-surface grid gap-2 p-4" aria-live="polite">
       <h3 className="text-sm font-bold text-[var(--text)]">길찾기/거리</h3>
@@ -72,6 +88,13 @@ export function RouteDistancePanel({ detail, targetPoint }: RouteDistancePanelPr
         <p className="text-sm text-[var(--warning)]">학교 좌표가 없어 거리 계산을 사용할 수 없습니다.</p>
       ) : null}
       {routeError ? <p className="text-sm text-[var(--danger)]">{routeError}</p> : null}
+      <button
+        type="button"
+        onClick={() => void handleCopyRouteLink()}
+        className="min-h-11 w-fit rounded-xl border border-[var(--border)] px-4 text-sm font-semibold text-[var(--text)]"
+      >
+        길찾기 링크 복사
+      </button>
     </section>
   );
 }
