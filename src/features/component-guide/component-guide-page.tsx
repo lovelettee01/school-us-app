@@ -152,12 +152,26 @@ interface ExampleBlockProps {
   feature: string;
   usage: string;
   children: ReactNode;
+  codeSnippet?: string;
 }
 
 /**
  * 기능/사용 방법/실행 데모를 고정 레이아웃으로 노출하는 예제 블록이다.
  */
-function ExampleBlock({ title, feature, usage, children }: ExampleBlockProps) {
+function ExampleBlock({ title, feature, usage, children, codeSnippet }: ExampleBlockProps) {
+  const [isCopied, setIsCopied] = useState(false);
+  const resolvedSnippet = codeSnippet ?? `// ${title}\n// 기능: ${feature}\n// 사용 방법: ${usage}`;
+
+  const handleCopySnippet = async () => {
+    try {
+      await navigator.clipboard.writeText(resolvedSnippet);
+      setIsCopied(true);
+      window.setTimeout(() => setIsCopied(false), 1200);
+    } catch {
+      setIsCopied(false);
+    }
+  };
+
   return (
     <AppCard title={title} className="grid gap-3">
       <div className="grid gap-1 rounded-lg border border-[var(--border)] bg-[var(--surface-muted)] p-3">
@@ -175,6 +189,19 @@ function ExampleBlock({ title, feature, usage, children }: ExampleBlockProps) {
         </Typography>
       </div>
       <div className="rounded-lg border border-[var(--border)] p-3">{children}</div>
+      <div className="grid gap-2 rounded-lg border border-[var(--border)] bg-[var(--surface-muted)] p-3">
+        <div className="flex items-center justify-between gap-2">
+          <Typography variant="caption" weight="bold">
+            예제 코드
+          </Typography>
+          <AppButton variant="secondary" size="sm" onClick={() => void handleCopySnippet()}>
+            {isCopied ? '복사됨' : '코드 복사'}
+          </AppButton>
+        </div>
+        <pre className="overflow-x-auto rounded-md bg-black/80 p-3 text-[11px] text-gray-100">
+          <code>{resolvedSnippet}</code>
+        </pre>
+      </div>
     </AppCard>
   );
 }
