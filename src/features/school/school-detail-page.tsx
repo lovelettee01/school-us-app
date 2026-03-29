@@ -4,13 +4,14 @@ import { useEffect, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { EmptyState, ErrorState, LoadingState, RetryButton } from '@/components/common/States';
+import { MessageModeToggle } from '@/components/common/MessageModeToggle';
 import { Tabs, type TabKey } from '@/components/common/Tabs';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
 import { MealTab } from '@/components/school/MealTab';
 import { SchoolHeader } from '@/components/school/SchoolHeader';
 import { SchoolInfoTab } from '@/components/school/SchoolInfoTab';
 import { TimetableTab } from '@/components/school/TimetableTab';
-import { useErrorToast } from '@/hooks/useErrorToast';
+import { useErrorMessage } from '@/hooks/useErrorMessage';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useRecents } from '@/hooks/useRecents';
 import { useSchoolDetail } from '@/hooks/useSchoolDetail';
@@ -38,7 +39,9 @@ export function SchoolDetailPage({ schoolKey }: SchoolDetailPageProps) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const { pushRecent } = useRecents();
 
-  useErrorToast(status === 'error', errorMessage ?? '학교 정보를 불러오지 못했습니다.');
+  useErrorMessage(status === 'error', errorMessage ?? '학교 정보를 불러오지 못했습니다.', {
+    dedupeKey: `school-detail:${schoolKey}`,
+  });
 
   const activePanel = useMemo(() => {
     if (!detail) {
@@ -87,7 +90,7 @@ export function SchoolDetailPage({ schoolKey }: SchoolDetailPageProps) {
   if (status === 'error' || !detail) {
     return (
       <div className="mx-auto w-full max-w-6xl px-4 py-6 md:px-6">
-        <ErrorState message={errorMessage ?? '학교 정보를 불러오지 못했습니다.'} retry={<RetryButton onRetry={retry} />} />
+        <ErrorState message="메시지 팝업을 확인한 뒤 다시 시도해 주세요." retry={<RetryButton onRetry={retry} />} />
       </div>
     );
   }
@@ -99,7 +102,10 @@ export function SchoolDetailPage({ schoolKey }: SchoolDetailPageProps) {
           <p className="text-sm font-semibold text-[var(--text-muted)]">학교 상세 정보</p>
           <h1 className="text-lg font-black text-[var(--text)]">{detail.schoolName}</h1>
         </div>
-        <ThemeToggle />
+        <div className="flex items-center gap-2">
+          <MessageModeToggle />
+          <ThemeToggle />
+        </div>
       </header>
 
       <SchoolHeader

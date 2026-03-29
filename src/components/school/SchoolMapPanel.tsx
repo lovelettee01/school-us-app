@@ -3,10 +3,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 
+import { AppButton } from '@/components/common/Button';
 import { CopyIcon } from '@/components/common/ButtonIcons';
 import { ErrorState, RetryButton } from '@/components/common/States';
 import { loadKakaoMapSdk } from '@/lib/kakao/map-loader';
-import { useErrorToast } from '@/hooks/useErrorToast';
+import { useErrorMessage } from '@/hooks/useErrorMessage';
 import type { SchoolDetail } from '@/types/school';
 
 interface SchoolMapPanelProps {
@@ -29,7 +30,9 @@ export function SchoolMapPanel({ detail, onResolvedPoint, currentLocationPoint, 
   const [status, setStatus] = useState<'loading' | 'ready' | 'error' | 'empty'>('loading');
   const [message, setMessage] = useState<string>('지도를 불러오는 중입니다.');
 
-  useErrorToast(status === 'error', message);
+  useErrorMessage(status === 'error', message, {
+    dedupeKey: `school-map:${detail.schoolKey}`,
+  });
 
   const initialPoint = useMemo(
     () =>
@@ -210,18 +213,17 @@ export function SchoolMapPanel({ detail, onResolvedPoint, currentLocationPoint, 
         <h3 className="text-sm font-bold text-[var(--text)]">학교 위치</h3>
         <p className="text-sm text-[var(--text-muted)]">{detail.addressRoad || '주소 정보 없음'}</p>
         <ErrorState
-          message={message}
+          message="메시지 팝업을 확인한 뒤 다시 시도해 주세요."
           retry={<RetryButton onRetry={() => void renderMap()} label="다시 시도" />}
         />
         {detail.addressRoad ? (
-          <button
-            type="button"
+          <AppButton
+            variant="secondary"
             onClick={() => void copyAddress()}
-            className="inline-flex min-h-9 w-fit items-center gap-1 rounded-xl border border-[var(--border)] px-3 text-xs font-semibold text-[var(--text)]"
+            leftIcon={<CopyIcon className="h-4 w-4" />}
           >
-            <CopyIcon className="h-4 w-4" />
             주소 복사
-          </button>
+          </AppButton>
         ) : null}
         {children ? <div className="mt-2 border-t border-[var(--border)] pt-3">{children}</div> : null}
       </section>
@@ -236,14 +238,13 @@ export function SchoolMapPanel({ detail, onResolvedPoint, currentLocationPoint, 
         <div className="grid gap-2">
           <p className="text-sm text-[var(--warning)]">{message}</p>
           {detail.addressRoad ? (
-            <button
-              type="button"
+            <AppButton
+              variant="secondary"
               onClick={() => void navigator.clipboard.writeText(detail.addressRoad)}
-              className="inline-flex min-h-9 w-fit items-center gap-1 rounded-xl border border-[var(--border)] px-3 text-xs font-semibold text-[var(--text)]"
+              leftIcon={<CopyIcon className="h-4 w-4" />}
             >
-              <CopyIcon className="h-4 w-4" />
               주소 복사
-            </button>
+            </AppButton>
           ) : null}
         </div>
       ) : null}

@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 
 import { readFavorites, writeFavorites } from '@/lib/storage/favorites';
-import { useToastStore } from '@/store/toast-store';
+import { useMessageStore } from '@/store/message-store';
 import type { FavoriteSchool, SchoolSummary } from '@/types/school';
 
 /**
@@ -17,7 +17,7 @@ const FAVORITE_MAX_COUNT = 10;
  */
 export function useFavorites() {
   const [favorites, setFavorites] = useState<FavoriteSchool[]>(() => readFavorites());
-  const pushToast = useToastStore((state) => state.pushToast);
+  const pushMessage = useMessageStore((state) => state.pushMessage);
 
   const favoriteSet = useMemo(() => new Set<string>(favorites.map((item) => item.schoolKey)), [favorites]);
 
@@ -50,9 +50,12 @@ export function useFavorites() {
       }
 
       if (prev.length >= FAVORITE_MAX_COUNT) {
-        pushToast({
-          message: `즐겨찾기는 최대 ${FAVORITE_MAX_COUNT}개까지 등록할 수 있습니다.`,
-          type: 'info',
+        pushMessage({
+          type: 'warning',
+          title: '즐겨찾기 등록 한도를 초과했습니다.',
+          description: `즐겨찾기는 최대 ${FAVORITE_MAX_COUNT}개까지 등록할 수 있습니다.`,
+          mode: 'toast',
+          dedupeKey: 'favorites:max-count',
         });
         return prev;
       }

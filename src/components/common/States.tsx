@@ -80,26 +80,6 @@ export function EmptyState({ title = '조회 결과가 없습니다.', message, 
   );
 }
 
-interface InlineFieldErrorProps {
-  id: string;
-  message?: string;
-}
-
-/**
- * 입력 필드 하단 인라인 검증 오류 메시지를 렌더링한다.
- */
-export function InlineFieldError({ id, message }: InlineFieldErrorProps) {
-  if (!message) {
-    return null;
-  }
-
-  return (
-    <p id={id} role="alert" aria-live="polite" className="mt-1 text-xs font-medium text-[var(--danger)]">
-      {message}
-    </p>
-  );
-}
-
 interface RetryButtonProps {
   onRetry: () => void;
   label?: string;

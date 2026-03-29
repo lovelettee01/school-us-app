@@ -3,13 +3,14 @@
 import { useMemo, useState } from 'react';
 
 import { EmptyState, ErrorState, LoadingState, RetryButton } from '@/components/common/States';
+import { MessageModeToggle } from '@/components/common/MessageModeToggle';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
 import { FavoriteSchools } from '@/components/search/FavoriteSchools';
 import { OfficeSelect } from '@/components/search/OfficeSelect';
 import { RecentSchools } from '@/components/search/RecentSchools';
 import { SchoolList } from '@/components/search/SchoolList';
 import { SchoolSearchForm } from '@/components/search/SchoolSearchForm';
-import { useErrorToast } from '@/hooks/useErrorToast';
+import { useErrorMessage } from '@/hooks/useErrorMessage';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useRecents } from '@/hooks/useRecents';
 import { useSchoolSearch } from '@/hooks/useSchoolSearch';
@@ -29,7 +30,9 @@ export function SearchPage() {
   const { recents, pushRecent, removeRecent } = useRecents();
   const { status, results, totalCount, errorMessage, search, reset } = useSchoolSearch();
 
-  useErrorToast(status === 'error', errorMessage ?? '학교 검색 중 오류가 발생했습니다.');
+  useErrorMessage(status === 'error', errorMessage ?? '학교 검색 중 오류가 발생했습니다.', {
+    dedupeKey: 'search-page:error',
+  });
 
   const hasMore = results.length > visibleCount;
 
@@ -53,7 +56,10 @@ export function SearchPage() {
           <h1 className="text-xl font-black text-[var(--text)]">학교 정보 조회</h1>
           <p className="mt-1 text-sm text-[var(--text-muted)]">시도교육청과 학교명을 선택해 학교를 검색하세요.</p>
         </div>
-        <ThemeToggle />
+        <div className="flex items-center gap-2">
+          <MessageModeToggle />
+          <ThemeToggle />
+        </div>
       </header>
 
       <SchoolSearchForm
@@ -68,7 +74,6 @@ export function SearchPage() {
           reset();
         }}
         isLoading={status === 'loading'}
-        errorMessage={status === 'error' ? errorMessage : undefined}
         officeSelect={<OfficeSelect value={officeCode} onChange={setOfficeCode} />}
       />
 
@@ -93,7 +98,7 @@ export function SearchPage() {
 
         {status === 'error' ? (
           <ErrorState
-            message={errorMessage ?? '학교 검색 중 오류가 발생했습니다.'}
+            message="메시지 팝업을 확인한 뒤 다시 시도해 주세요."
             retry={<RetryButton onRetry={handleSubmit} />}
           />
         ) : null}

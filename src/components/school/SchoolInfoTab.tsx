@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import { AppButton } from '@/components/common/Button';
 import { RouteDistancePanel } from '@/components/school/RouteDistancePanel';
 import { SchoolMapPanel } from '@/components/school/SchoolMapPanel';
 import type { SchoolDetail } from '@/types/school';
@@ -39,18 +40,18 @@ export function SchoolInfoTab({ detail }: SchoolInfoTabProps) {
   return (
     <div id="panel-info" role="tabpanel" aria-labelledby="tab-info" className="grid gap-3">
       <section className="card-surface p-4">
-        <button
-          type="button"
+        <AppButton
+          variant="ghost"
           aria-expanded={isInfoAccordionOpen}
           aria-controls="school-basic-info-panel"
           onClick={() => setIsInfoAccordionOpen((prev) => !prev)}
-          className="flex w-full items-center justify-between text-left"
+          className="flex w-full justify-between"
         >
           <h3 className="text-sm font-bold text-[var(--text)]">학교 기본 정보</h3>
           <span className="text-xs font-semibold text-[var(--text-muted)]">
             {isInfoAccordionOpen ? '접기' : '펼치기'}
           </span>
-        </button>
+        </AppButton>
         <div
           id="school-basic-info-panel"
           aria-hidden={!isInfoAccordionOpen}
