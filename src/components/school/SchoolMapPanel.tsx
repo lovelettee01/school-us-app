@@ -11,9 +11,23 @@ import { useErrorMessage } from '@/hooks/useErrorMessage';
 import type { SchoolDetail } from '@/types/school';
 
 interface SchoolMapPanelProps {
+  /**
+   * 지도 렌더링 기준이 되는 학교 상세 데이터다.
+   */
   detail: SchoolDetail;
+  /**
+   * 학교 좌표 해석 완료 시 상위 컴포넌트로 전달하는 콜백이다.
+   */
   onResolvedPoint: (point: { lat: number; lng: number } | undefined) => void;
+  /**
+   * 상위에서 전달받는 현재 위치 좌표다.
+   * 학교 위치와 함께 지도 오버레이를 그리는 데 사용한다.
+   */
   currentLocationPoint?: { lat: number; lng: number };
+  /**
+   * 지도 하단 보조 패널 슬롯이다.
+   * 예: 거리 계산 패널.
+   */
   children?: ReactNode;
 }
 

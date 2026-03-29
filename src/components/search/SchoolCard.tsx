@@ -8,9 +8,21 @@ import { DetailIcon, StarIcon } from '@/components/common/ButtonIcons';
 import type { SchoolSummary } from '@/types/school';
 
 interface SchoolCardProps {
+  /**
+   * 카드에 표시할 학교 요약 데이터다.
+   */
   school: SchoolSummary;
+  /**
+   * 현재 학교의 즐겨찾기 여부다.
+   */
   isFavorite: boolean;
+  /**
+   * 즐겨찾기 토글 콜백이다.
+   */
   onFavoriteToggle: (school: SchoolSummary) => void;
+  /**
+   * 상세 페이지 이동 직전 실행할 콜백이다.
+   */
   onBeforeNavigate: (school: SchoolSummary) => void;
 }
 

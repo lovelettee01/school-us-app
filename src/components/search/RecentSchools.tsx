@@ -7,7 +7,13 @@ import { TrashIcon } from '@/components/common/ButtonIcons';
 import type { RecentSchool } from '@/types/school';
 
 interface RecentSchoolsProps {
+  /**
+   * 렌더링할 최근 조회 학교 목록이다.
+   */
   items: RecentSchool[];
+  /**
+   * 최근 조회 항목 제거 콜백이다.
+   */
   onRemove: (schoolKey: string) => void;
 }
 

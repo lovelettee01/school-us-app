@@ -31,9 +31,9 @@
   - `src/components/common/States.tsx` (`ErrorState`)
 
 ## Phase 2~7 상세 문서
-- [x] `prompt/component-guide-spec.md`
-- [x] `prompt/message-system-spec.md`
-- [x] `prompt/error-mapping-matrix.md`
+- [x] `prompt/refactoring/component-guide-spec.md`
+- [x] `prompt/refactoring/message-system-spec.md`
+- [x] `prompt/refactoring/error-mapping-matrix.md`
 
 ## 리스크 메모
 - 에러 메시지를 팝업/토스트 중심으로 전환할 때, 기존 화면의 재시도 동작 문맥이 약해질 수 있다.

@@ -8,12 +8,24 @@ import { SchoolMapPanel } from '@/components/school/SchoolMapPanel';
 import type { SchoolDetail } from '@/types/school';
 
 interface SchoolInfoTabProps {
+  /**
+   * 학교정보 탭에 표시할 학교 상세 데이터다.
+   */
   detail: SchoolDetail;
 }
 
 interface InfoCardItem {
+  /**
+   * 카드 아이템 고유 키다.
+   */
   key: string;
+  /**
+   * 카드 타이틀 라벨이다.
+   */
   title: string;
+  /**
+   * 카드 본문 값이다.
+   */
   value: string;
 }
 

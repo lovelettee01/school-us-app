@@ -12,20 +12,48 @@ import { useMessageStore } from '@/store/message-store';
 import type { SchoolDetail } from '@/types/school';
 
 interface RouteDistancePanelProps {
+  /**
+   * 길찾기/거리 계산 대상 학교 데이터다.
+   */
   detail: SchoolDetail;
+  /**
+   * 계산 대상 좌표(학교 위치)다.
+   * 값이 없으면 거리 계산 기능이 비활성화된다.
+   */
   targetPoint?: { lat: number; lng: number };
+  /**
+   * 현재 위치 해석 결과를 상위 컴포넌트로 전달하는 콜백이다.
+   */
   onLocationResolved?: (point: { lat: number; lng: number } | undefined) => void;
 }
 
 interface TravelTimeEstimate {
+  /**
+   * 도보 예상 소요 시간(분)이다.
+   */
   walkMinutes: number;
+  /**
+   * 자전거 예상 소요 시간(분)이다.
+   */
   bikeMinutes: number;
+  /**
+   * 차량 예상 소요 시간(분)이다.
+   */
   carMinutes: number;
 }
 
 interface TravelTimeCardItem {
+  /**
+   * 이동수단 식별 키다.
+   */
   key: 'walk' | 'bike' | 'car';
+  /**
+   * 카드에 노출할 이동수단 라벨이다.
+   */
   title: string;
+  /**
+   * 이동수단별 예상 시간(분)이다.
+   */
   minutes: number;
 }
 

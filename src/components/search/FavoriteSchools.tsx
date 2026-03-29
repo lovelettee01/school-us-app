@@ -7,7 +7,13 @@ import { TrashIcon } from '@/components/common/ButtonIcons';
 import type { FavoriteSchool } from '@/types/school';
 
 interface FavoriteSchoolsProps {
+  /**
+   * 렌더링할 즐겨찾기 학교 목록이다.
+   */
   items: FavoriteSchool[];
+  /**
+   * 즐겨찾기 항목 제거 콜백이다.
+   */
   onRemove: (schoolKey: string) => void;
 }
 

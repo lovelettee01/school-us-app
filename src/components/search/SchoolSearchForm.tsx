@@ -4,14 +4,41 @@ import { ResetIcon, SearchIcon } from '@/components/common/ButtonIcons';
 import { AppButton } from '@/components/common/Button';
 
 interface SchoolSearchFormProps {
+  /**
+   * 현재 선택된 시도교육청 코드다.
+   */
   officeCode: string;
+  /**
+   * 초기화 시 되돌아갈 기본 교육청 코드다.
+   */
   defaultOfficeCode: string;
+  /**
+   * 사용자 입력 학교명 문자열이다.
+   */
   schoolName: string;
+  /**
+   * 교육청 선택 변경 콜백이다.
+   */
   onOfficeChange: (value: string) => void;
+  /**
+   * 학교명 입력 변경 콜백이다.
+   */
   onSchoolNameChange: (value: string) => void;
+  /**
+   * 조회 실행 콜백이다.
+   */
   onSubmit: () => void;
+  /**
+   * 폼 초기화 콜백이다.
+   */
   onReset: () => void;
+  /**
+   * 조회 진행 중 여부다.
+   */
   isLoading: boolean;
+  /**
+   * 외부에서 주입하는 교육청 선택 UI 노드다.
+   */
   officeSelect: ReactNode;
 }
 

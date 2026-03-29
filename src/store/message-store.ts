@@ -5,14 +5,41 @@ import { create } from 'zustand';
 import type { MessageDisplayMode, PushMessageInput, UiMessage } from '@/types/message';
 
 interface MessageStore {
+  /**
+   * 전역 기본 메시지 표시 모드다.
+   */
   defaultMode: MessageDisplayMode;
+  /**
+   * 현재 노출 중인 토스트 메시지 목록이다.
+   */
   toastMessages: UiMessage[];
+  /**
+   * 현재 활성화된 팝업 메시지다.
+   */
   activePopup: UiMessage | null;
+  /**
+   * 팝업 대기열 목록이다.
+   */
   popupQueue: UiMessage[];
+  /**
+   * 기본 메시지 모드를 변경한다.
+   */
   setDefaultMode: (mode: MessageDisplayMode) => void;
+  /**
+   * 새 메시지를 큐에 삽입한다.
+   */
   pushMessage: (input: PushMessageInput) => void;
+  /**
+   * 특정 토스트 메시지를 제거한다.
+   */
   dismissToast: (id: number) => void;
+  /**
+   * 현재 팝업을 닫고 다음 대기 팝업을 활성화한다.
+   */
   dismissPopup: () => void;
+  /**
+   * 토스트/팝업 큐를 모두 초기화한다.
+   */
   clearMessages: () => void;
 }
 

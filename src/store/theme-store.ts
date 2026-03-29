@@ -5,7 +5,13 @@ import { create } from 'zustand';
 import type { ThemeMode } from '@/types/theme';
 
 interface ThemeStore {
+  /**
+   * 현재 선택된 테마 모드다.
+   */
   mode: ThemeMode;
+  /**
+   * 테마 모드를 변경하는 액션이다.
+   */
   setMode: (mode: ThemeMode) => void;
 }
 

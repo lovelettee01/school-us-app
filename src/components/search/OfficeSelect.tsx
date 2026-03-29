@@ -1,7 +1,13 @@
 ﻿import { OFFICES } from '@/constants/offices';
 
 interface OfficeSelectProps {
+  /**
+   * 현재 선택된 교육청 코드다.
+   */
   value: string;
+  /**
+   * 선택 변경 시 호출되는 콜백이다.
+   */
   onChange: (value: string) => void;
 }
 

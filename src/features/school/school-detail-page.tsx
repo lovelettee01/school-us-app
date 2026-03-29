@@ -17,6 +17,10 @@ import { useRecents } from '@/hooks/useRecents';
 import { useSchoolDetail } from '@/hooks/useSchoolDetail';
 
 interface SchoolDetailPageProps {
+  /**
+   * 상세 화면 조회 대상 학교 키다.
+   * 형식: `{officeCode}-{schoolCode}`
+   */
   schoolKey: string;
 }
 

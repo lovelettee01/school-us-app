@@ -103,15 +103,36 @@ function GuideSectionLayout({ title, description, children }: GuideSectionLayout
 }
 
 interface PropDocItem {
+  /**
+   * Props 이름이다.
+   */
   name: string;
+  /**
+   * Props 타입 문자열이다.
+   */
   type: string;
+  /**
+   * 필수 여부 표기값이다.
+   */
   required: 'Y' | 'N';
+  /**
+   * 기본값 또는 기본 동작 설명이다.
+   */
   defaultValue: string;
+  /**
+   * Props 사용 목적과 동작 설명이다.
+   */
   description: string;
 }
 
 interface PropDocTableProps {
+  /**
+   * Props 표 제목이다.
+   */
   title: string;
+  /**
+   * 표에 노출할 Props 문서 행 목록이다.
+   */
   items: PropDocItem[];
 }
 
@@ -148,10 +169,26 @@ function PropDocTable({ title, items }: PropDocTableProps) {
 }
 
 interface ExampleBlockProps {
+  /**
+   * 예제 블록 제목이다.
+   */
   title: string;
+  /**
+   * 예제의 핵심 기능 설명이다.
+   */
   feature: string;
+  /**
+   * 예제의 권장 사용 방법 설명이다.
+   */
   usage: string;
+  /**
+   * 실제 렌더링할 데모 UI다.
+   */
   children: ReactNode;
+  /**
+   * 복사 버튼에서 사용할 코드 스니펫이다.
+   * 미지정 시 기본 템플릿을 자동 생성한다.
+   */
   codeSnippet?: string;
 }
 

@@ -14,11 +14,20 @@ import { toYmd } from '@/lib/utils/date';
 import type { SchoolDetail } from '@/types/school';
 
 interface MealTabProps {
+  /**
+   * 급식 조회에 사용할 학교 상세 데이터다.
+   */
   detail: SchoolDetail;
 }
 
 interface ParsedMealLine {
+  /**
+   * 알레르기 표기를 제거한 메뉴 본문 텍스트다.
+   */
   baseText: string;
+  /**
+   * 메뉴 라인에서 추출한 알레르기 코드 목록이다.
+   */
   allergyCodes: string[];
 }
 

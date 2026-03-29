@@ -13,6 +13,9 @@ import type { SchoolDetail } from '@/types/school';
 import type { TimetableItem } from '@/types/timetable';
 
 interface TimetableTabProps {
+  /**
+   * 시간표 조회에 사용할 학교 상세 데이터다.
+   */
   detail: SchoolDetail;
 }
 

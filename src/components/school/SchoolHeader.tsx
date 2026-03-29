@@ -8,8 +8,17 @@ import { HomeIcon, StarIcon } from '@/components/common/ButtonIcons';
 import type { SchoolDetail } from '@/types/school';
 
 interface SchoolHeaderProps {
+  /**
+   * 상단 헤더에 표시할 학교 상세 데이터다.
+   */
   detail: SchoolDetail;
+  /**
+   * 현재 학교의 즐겨찾기 여부다.
+   */
   isFavorite: boolean;
+  /**
+   * 즐겨찾기 토글 콜백이다.
+   */
   onToggleFavorite: () => void;
 }
 

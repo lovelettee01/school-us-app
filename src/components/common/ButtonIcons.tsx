@@ -1,10 +1,17 @@
 ﻿import type { SVGProps } from 'react';
 
 interface IconProps extends SVGProps<SVGSVGElement> {
+  /**
+   * 아이콘에 적용할 CSS 클래스 문자열이다.
+   */
   className?: string;
 }
 
 interface StarIconProps extends IconProps {
+  /**
+   * 즐겨찾기 아이콘의 채움 여부다.
+   * `true`일 때 내부를 채워 활성 상태를 표현한다.
+   */
   filled?: boolean;
 }
 

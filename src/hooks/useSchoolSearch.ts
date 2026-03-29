@@ -7,9 +7,21 @@ import type { ApiResult } from '@/types/api';
 import type { SchoolSummary } from '@/types/school';
 
 interface SearchState {
+  /**
+   * 검색 비동기 처리 상태다.
+   */
   status: 'idle' | 'loading' | 'success' | 'empty' | 'error';
+  /**
+   * 오류 발생 시 사용자에게 노출할 메시지다.
+   */
   errorMessage?: string;
+  /**
+   * 검색 결과 총 건수다.
+   */
   totalCount: number;
+  /**
+   * 현재 조회된 학교 목록이다.
+   */
   results: SchoolSummary[];
 }
 
