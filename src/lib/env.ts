@@ -19,6 +19,7 @@ export function getPublicEnv() {
   return {
     kakaoMapAppKey: process.env.NEXT_PUBLIC_KAKAO_MAP_APP_KEY ?? '',
     defaultTheme: process.env.NEXT_PUBLIC_DEFAULT_THEME ?? 'system',
+    defaultMessageMode: process.env.NEXT_PUBLIC_MESSAGE_DISPLAY_MODE ?? 'auto',
     recentMaxCount: Number(process.env.NEXT_PUBLIC_RECENT_MAX_COUNT ?? 10),
   };
 }

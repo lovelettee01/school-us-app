@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 
+import { AppButton } from '@/components/common/Button';
 import { TrashIcon } from '@/components/common/ButtonIcons';
 import type { RecentSchool } from '@/types/school';
 
@@ -31,15 +32,17 @@ export function RecentSchools({ items, onRemove }: RecentSchoolsProps) {
                 <p className="truncate text-sm font-semibold text-[var(--text)]">{item.schoolName}</p>
                 <p className="truncate text-xs text-[var(--text-muted)]">{item.officeName}</p>
               </Link>
-              <button
-                type="button"
+              <AppButton
+                variant="secondary"
+                size="sm"
                 onClick={() => onRemove(item.schoolKey)}
-                className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-[var(--border)] bg-[var(--surface)] text-[var(--text)]"
+                className="min-h-7 min-w-7 rounded-md px-1.5"
+                leftIcon={<TrashIcon className="h-3.5 w-3.5" />}
                 aria-label={`${item.schoolName} 최근 조회 삭제`}
                 title="삭제"
               >
-                <TrashIcon className="h-3.5 w-3.5" />
-              </button>
+                <span className="sr-only">삭제</span>
+              </AppButton>
             </li>
           ))}
         </ul>

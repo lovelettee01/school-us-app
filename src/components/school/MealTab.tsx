@@ -3,10 +3,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 
+import { AppButton } from '@/components/common/Button';
+import { Badge } from '@/components/common/Badge';
 import { InfoIcon, MealIcon, SearchIcon } from '@/components/common/ButtonIcons';
 import { EmptyState, ErrorState, LoadingState, RetryButton } from '@/components/common/States';
 import { MEAL_ALLERGY_REFERENCE } from '@/constants/meal-allergy';
-import { useErrorToast } from '@/hooks/useErrorToast';
+import { useErrorMessage } from '@/hooks/useErrorMessage';
 import { useMeals } from '@/hooks/useMeals';
 import { toYmd } from '@/lib/utils/date';
 import type { SchoolDetail } from '@/types/school';
@@ -84,7 +86,9 @@ export function MealTab({ detail }: MealTabProps) {
   const [openMealItems, setOpenMealItems] = useState<Record<string, boolean>>({});
   const { status, items, errorMessage, fetchMeals } = useMeals();
 
-  useErrorToast(status === 'error', errorMessage ?? '급식 정보를 불러오지 못했습니다.');
+  useErrorMessage(status === 'error', errorMessage ?? '급식 정보를 불러오지 못했습니다.', {
+    dedupeKey: `meal-tab:${detail.schoolKey}`,
+  });
 
   const handleFetch = useCallback(async () => {
     await fetchMeals({
@@ -154,15 +158,14 @@ export function MealTab({ detail }: MealTabProps) {
             className="min-h-10 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-sm"
           />
         </div>
-        <button
-          type="button"
+        <AppButton
           onClick={() => void handleFetch()}
-          disabled={status === 'loading'}
-          className="inline-flex min-h-9 items-center gap-1 rounded-xl bg-[var(--primary)] px-3 text-xs font-semibold text-[var(--primary-contrast)]"
+          isLoading={status === 'loading'}
+          loadingLabel="조회 중"
+          leftIcon={<SearchIcon className="h-4 w-4" />}
         >
-          <SearchIcon className="h-4 w-4" />
           조회
-        </button>
+        </AppButton>
       </section>
 
       {status === 'loading' ? <LoadingState description="급식 정보를 조회하고 있습니다." /> : null}
@@ -173,7 +176,7 @@ export function MealTab({ detail }: MealTabProps) {
 
       {status === 'error' ? (
         <ErrorState
-          message={errorMessage ?? '급식 정보를 불러오지 못했습니다.'}
+          message="메시지 팝업을 확인한 뒤 다시 시도해 주세요."
           retry={<RetryButton onRetry={() => void handleFetch()} />}
         />
       ) : null}
@@ -237,9 +240,9 @@ export function MealTab({ detail }: MealTabProps) {
                   <div className="flex items-center gap-2">
                     <h3 className="text-sm font-bold text-[var(--text)]">{item.mealDate}</h3>
                     {item.mealDate.replaceAll('-', '') === todayYmd ? (
-                      <span className="rounded-full bg-[var(--primary)] px-2 py-0.5 text-[10px] font-bold text-[var(--primary-contrast)]">
+                      <Badge variant="primary" size="sm">
                         TODAY
-                      </span>
+                      </Badge>
                     ) : null}
                   </div>
                   <span className="inline-flex items-center gap-1 rounded-full bg-[var(--surface-muted)] px-2 py-1 text-xs text-[var(--text-muted)]">

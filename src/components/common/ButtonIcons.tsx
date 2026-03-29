@@ -206,6 +206,40 @@ export function CopyIcon(props: IconProps) {
   );
 }
 
+/** 메시지 자동 모드 아이콘 */
+export function MessageIcon(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-5 4V6Z" />
+      <path d="M8 9h8" />
+      <path d="M8 12h5" />
+    </BaseIcon>
+  );
+}
+
+/** 메시지 토스트 모드 아이콘 */
+export function ToastIcon(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <rect x="4" y="5" width="16" height="10" rx="2" />
+      <path d="M8 19h8" />
+      <path d="M10 15v4" />
+      <path d="M14 15v4" />
+    </BaseIcon>
+  );
+}
+
+/** 메시지 팝업 모드 아이콘 */
+export function PopupIcon(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <path d="M8 9h8" />
+      <path d="M8 13h5" />
+    </BaseIcon>
+  );
+}
+
 /** 닫기(X) 아이콘 */
 export function CloseIcon(props: IconProps) {
   return (

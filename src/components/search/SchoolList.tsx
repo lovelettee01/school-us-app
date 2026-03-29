@@ -1,4 +1,5 @@
-﻿import { MoreIcon } from '@/components/common/ButtonIcons';
+﻿import { AppButton } from '@/components/common/Button';
+import { MoreIcon } from '@/components/common/ButtonIcons';
 import { SchoolCard } from '@/components/search/SchoolCard';
 import type { SchoolSummary } from '@/types/school';
 
@@ -37,14 +38,9 @@ export function SchoolList({
       ))}
 
       {hasMore ? (
-        <button
-          type="button"
-          onClick={onMore}
-          className="inline-flex min-h-9 items-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-xs font-semibold text-[var(--text)]"
-        >
-          <MoreIcon className="h-4 w-4" />
+        <AppButton variant="secondary" onClick={onMore} leftIcon={<MoreIcon className="h-4 w-4" />}>
           더보기
-        </button>
+        </AppButton>
       ) : null}
     </section>
   );

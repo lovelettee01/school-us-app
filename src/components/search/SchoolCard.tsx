@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 
+import { AppButton } from '@/components/common/Button';
+import { Badge } from '@/components/common/Badge';
 import { DetailIcon, StarIcon } from '@/components/common/ButtonIcons';
 import type { SchoolSummary } from '@/types/school';
 
@@ -20,9 +22,9 @@ export function SchoolCard({ school, isFavorite, onFavoriteToggle, onBeforeNavig
     <article className="card-surface p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-base font-bold text-[var(--text)]">{school.schoolName}</h3>
-        <span className="rounded-full bg-[var(--surface-muted)] px-2 py-1 text-xs font-semibold text-[var(--text-muted)]">
+        <Badge variant="neutral">
           {school.schoolType}
-        </span>
+        </Badge>
       </div>
 
       <p className="mt-2 text-sm text-[var(--text-muted)]">{school.officeName}</p>
@@ -38,20 +40,15 @@ export function SchoolCard({ school, isFavorite, onFavoriteToggle, onBeforeNavig
           <DetailIcon className="h-4 w-4" />
           상세 보기
         </Link>
-        <button
-          type="button"
+        <AppButton
+          variant={isFavorite ? 'danger' : 'secondary'}
           onClick={() => onFavoriteToggle(school)}
           aria-label={isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
           title={isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
-          className={[
-            'inline-flex min-h-9 min-w-9 items-center justify-center rounded-xl border px-2 text-xs font-semibold',
-            isFavorite
-              ? 'border-amber-300 bg-amber-50 text-amber-600'
-              : 'border-[var(--border)] bg-[var(--surface)] text-[var(--text)]',
-          ].join(' ')}
+          leftIcon={<StarIcon className="h-4 w-4" filled={isFavorite} />}
         >
-          <StarIcon className="h-4 w-4" filled={isFavorite} />
-        </button>
+          {isFavorite ? '해제' : '즐겨찾기'}
+        </AppButton>
       </div>
     </article>
   );

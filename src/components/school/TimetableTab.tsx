@@ -2,9 +2,10 @@
 
 import { useMemo, useState } from 'react';
 
+import { AppButton } from '@/components/common/Button';
 import { SearchIcon } from '@/components/common/ButtonIcons';
 import { EmptyState, ErrorState, LoadingState, RetryButton } from '@/components/common/States';
-import { useErrorToast } from '@/hooks/useErrorToast';
+import { useErrorMessage } from '@/hooks/useErrorMessage';
 import { useTimetable } from '@/hooks/useTimetable';
 import { getWeekRangeYmd } from '@/lib/utils/date';
 import { resolveSchoolLevel } from '@/lib/utils/school-level';
@@ -55,7 +56,9 @@ export function TimetableTab({ detail }: TimetableTabProps) {
   const [isWeeklyMode, setIsWeeklyMode] = useState<boolean>(true);
   const [baseDate, setBaseDate] = useState(() => new Date().toISOString().slice(0, 10));
   const { status, items, errorMessage, fetchTimetable } = useTimetable();
-  useErrorToast(status === 'error', errorMessage ?? '시간표를 불러오지 못했습니다.');
+  useErrorMessage(status === 'error', errorMessage ?? '시간표를 불러오지 못했습니다.', {
+    dedupeKey: `timetable-tab:${detail.schoolKey}`,
+  });
 
   const weekRange = useMemo(() => {
     const parsed = new Date(baseDate);
@@ -174,15 +177,15 @@ export function TimetableTab({ detail }: TimetableTabProps) {
           </select>
         </div>
 
-        <button
-          type="button"
+        <AppButton
           onClick={handleFetch}
           disabled={status === 'loading' || !grade || !classNo}
-          className="inline-flex min-h-9 items-center gap-1 rounded-xl bg-[var(--primary)] px-3 text-xs font-semibold text-[var(--primary-contrast)]"
+          leftIcon={<SearchIcon className="h-4 w-4" />}
+          isLoading={status === 'loading'}
+          loadingLabel="조회 중"
         >
-          <SearchIcon className="h-4 w-4" />
           조회
-        </button>
+        </AppButton>
       </section>
 
       {!grade || !classNo ? (
@@ -195,7 +198,7 @@ export function TimetableTab({ detail }: TimetableTabProps) {
 
       {status === 'error' ? (
         <ErrorState
-          message={errorMessage ?? '시간표를 불러오지 못했습니다.'}
+          message="메시지 팝업을 확인한 뒤 다시 시도해 주세요."
           retry={<RetryButton onRetry={handleFetch} />}
         />
       ) : null}

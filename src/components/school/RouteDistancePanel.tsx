@@ -1,13 +1,14 @@
 ﻿'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import type { KeyboardEvent } from 'react';
 
+import { AppButton } from '@/components/common/Button';
 import { BikeIcon, CarIcon, CloseIcon, CopyIcon, DistanceIcon, RouteIcon, WalkIcon } from '@/components/common/ButtonIcons';
 import { buildKakaoRouteUrl } from '@/lib/kakao/route-link';
 import { calculateDistanceMeters, formatDistance } from '@/lib/kakao/distance';
 import { useCurrentLocation } from '@/hooks/useCurrentLocation';
-import { useErrorToast } from '@/hooks/useErrorToast';
+import { useErrorMessage } from '@/hooks/useErrorMessage';
+import { useMessageStore } from '@/store/message-store';
 import type { SchoolDetail } from '@/types/school';
 
 interface RouteDistancePanelProps {
@@ -56,14 +57,16 @@ function formatDurationToHourMinute(totalMinutes: number): string {
 
 /**
  * 길찾기 링크와 현재 위치 기반 거리 계산 UI를 제공하는 패널이다.
+ * 에러/성공 안내는 패널 하단 텍스트 대신 전역 메시지 시스템으로 노출한다.
  */
 export function RouteDistancePanel({ detail, targetPoint, onLocationResolved }: RouteDistancePanelProps) {
-  const [routeError, setRouteError] = useState<string | undefined>(undefined);
   const [isDistanceResultClosed, setIsDistanceResultClosed] = useState(false);
   const { status, location, errorMessage, requestLocation } = useCurrentLocation();
+  const pushMessage = useMessageStore((state) => state.pushMessage);
 
-  useErrorToast(Boolean(errorMessage), errorMessage);
-  useErrorToast(Boolean(routeError), routeError);
+  useErrorMessage(Boolean(errorMessage), errorMessage, {
+    dedupeKey: `route-distance:location:${detail.schoolKey}`,
+  });
 
   const distanceInfo = useMemo(() => {
     if (!location || !targetPoint) {
@@ -91,6 +94,7 @@ export function RouteDistancePanel({ detail, targetPoint, onLocationResolved }: 
       { key: 'car', title: '차량', minutes: distanceInfo.travelTime.carMinutes },
     ];
   }, [distanceInfo]);
+
   const isDistanceResultVisible = Boolean(distanceInfo) && !isDistanceResultClosed;
 
   /**
@@ -111,7 +115,6 @@ export function RouteDistancePanel({ detail, targetPoint, onLocationResolved }: 
   }, [location, onLocationResolved]);
 
   const handleOpenRoute = () => {
-    setRouteError(undefined);
     const url = buildKakaoRouteUrl({
       schoolName: detail.schoolName,
       lat: targetPoint?.lat,
@@ -121,7 +124,12 @@ export function RouteDistancePanel({ detail, targetPoint, onLocationResolved }: 
 
     const opened = window.open(url, '_blank', 'noopener,noreferrer');
     if (!opened) {
-      setRouteError('길찾기 페이지를 열지 못했습니다. 팝업 차단을 확인해 주세요.');
+      pushMessage({
+        type: 'error',
+        title: '길찾기 페이지를 열지 못했습니다.',
+        description: '브라우저 팝업 차단 설정을 확인해 주세요.',
+        dedupeKey: `route-distance:open-fail:${detail.schoolKey}`,
+      });
     }
   };
 
@@ -135,9 +143,18 @@ export function RouteDistancePanel({ detail, targetPoint, onLocationResolved }: 
 
     try {
       await navigator.clipboard.writeText(url);
-      setRouteError('길찾기 링크를 복사했습니다.');
+      pushMessage({
+        type: 'success',
+        title: '길찾기 링크를 복사했습니다.',
+        dedupeKey: `route-distance:copy-success:${detail.schoolKey}`,
+      });
     } catch {
-      setRouteError('링크 복사에 실패했습니다. 다시 시도해 주세요.');
+      pushMessage({
+        type: 'error',
+        title: '링크 복사에 실패했습니다.',
+        description: '잠시 후 다시 시도해 주세요.',
+        dedupeKey: `route-distance:copy-fail:${detail.schoolKey}`,
+      });
     }
   };
 
@@ -148,6 +165,13 @@ export function RouteDistancePanel({ detail, targetPoint, onLocationResolved }: 
    */
   const handleRequestDistance = () => {
     if (!targetPoint || status === 'loading') {
+      if (!targetPoint) {
+        pushMessage({
+          type: 'warning',
+          title: '학교 좌표가 없어 거리 계산을 사용할 수 없습니다.',
+          dedupeKey: `route-distance:no-target:${detail.schoolKey}`,
+        });
+      }
       return;
     }
 
@@ -168,78 +192,38 @@ export function RouteDistancePanel({ detail, targetPoint, onLocationResolved }: 
     onLocationResolved?.(undefined);
   };
 
-  /**
-   * span 기반 상호작용 요소에서 Enter/Space 입력을 클릭과 동일하게 처리한다.
-   */
-  const handleActionKeyDown = (
-    event: KeyboardEvent<HTMLSpanElement>,
-    handler: () => void,
-    isDisabled: boolean = false,
-  ) => {
-    if (isDisabled) {
-      return;
-    }
-
-    if (event.key !== 'Enter' && event.key !== ' ') {
-      return;
-    }
-
-    event.preventDefault();
-    handler();
-  };
-
   return (
     <section className="grid gap-1.5" aria-live="polite">
       <div className="flex flex-wrap gap-2">
-        <span
-          role="button"
-          tabIndex={0}
-          aria-label="길찾기 열기"
-          title="길찾기 열기"
+        <AppButton
+          variant="secondary"
+          size="sm"
           onClick={handleOpenRoute}
-          onKeyDown={(event) => handleActionKeyDown(event, handleOpenRoute)}
-          className="inline-flex cursor-pointer items-center gap-1 rounded-full bg-[var(--surface-muted)] px-2 py-1 text-xs text-[var(--text-muted)] transition"
+          leftIcon={<RouteIcon className="h-3.5 w-3.5" />}
         >
-          <RouteIcon className="h-3.5 w-3.5" /> 길찾기
-        </span>
+          길찾기
+        </AppButton>
 
-        <span
-          role="button"
-          tabIndex={0}
-          aria-label="길찾기 링크 복사"
-          title="길찾기 링크 복사"
+        <AppButton
+          variant="secondary"
+          size="sm"
           onClick={() => void handleCopyRouteLink()}
-          onKeyDown={(event) =>
-            handleActionKeyDown(event, () => {
-              void handleCopyRouteLink();
-            })
-          }
-          className="inline-flex cursor-pointer items-center gap-1 rounded-full bg-[var(--surface-muted)] px-2 py-1 text-xs text-[var(--text-muted)] transition"
+          leftIcon={<CopyIcon className="h-3.5 w-3.5" />}
         >
-          <CopyIcon className="h-3.5 w-3.5" /> 링크복사
-        </span>
+          링크복사
+        </AppButton>
 
-        <span
-          role="button"
-          tabIndex={!targetPoint || status === 'loading' ? -1 : 0}
-          aria-label={status === 'loading' ? '위치 확인 중' : '거리 계산'}
-          title={status === 'loading' ? '위치 확인 중' : '거리 계산'}
-          aria-disabled={!targetPoint || status === 'loading'}
+        <AppButton
+          variant={isDistanceResultVisible ? 'primary' : 'secondary'}
+          size="sm"
+          disabled={!targetPoint || status === 'loading'}
+          isLoading={status === 'loading'}
+          loadingLabel="확인 중"
           onClick={handleRequestDistance}
-          onKeyDown={(event) =>
-            handleActionKeyDown(event, handleRequestDistance, !targetPoint || status === 'loading')
-          }
-          className={[
-            'inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs transition',
-            !targetPoint || status === 'loading'
-              ? 'cursor-not-allowed bg-[var(--surface-muted)] text-[var(--text-muted)]/60'
-              : isDistanceResultVisible
-                ? 'cursor-pointer bg-[var(--primary)] text-[var(--primary-contrast)]'
-                : 'cursor-pointer bg-[var(--surface-muted)] text-[var(--text-muted)]',
-          ].join(' ')}
+          leftIcon={<DistanceIcon className="h-3.5 w-3.5" />}
         >
-          <DistanceIcon className="h-3.5 w-3.5" /> 거리계산
-        </span>
+          거리계산
+        </AppButton>
       </div>
 
       {isDistanceResultVisible ? (
@@ -282,12 +266,9 @@ export function RouteDistancePanel({ detail, targetPoint, onLocationResolved }: 
             })}
           </div>
         </section>
-      ) : null}
-      {errorMessage ? <p className="text-sm text-[var(--warning)]">{errorMessage}</p> : null}
-      {!targetPoint ? (
-        <p className="text-sm text-[var(--warning)]">학교 좌표가 없어 거리 계산을 사용할 수 없습니다.</p>
-      ) : null}
-      {routeError ? <p className="text-sm text-[var(--danger)]">{routeError}</p> : null}
+      ) : (
+        <p className="text-xs text-[var(--text-muted)]">거리 계산을 실행하면 현재 위치 기준 예상 이동시간을 확인할 수 있습니다.</p>
+      )}
     </section>
   );
 }

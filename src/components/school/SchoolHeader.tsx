@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 
+import { AppButton } from '@/components/common/Button';
+import { Badge } from '@/components/common/Badge';
 import { HomeIcon, StarIcon } from '@/components/common/ButtonIcons';
 import type { SchoolDetail } from '@/types/school';
 
@@ -20,29 +22,27 @@ export function SchoolHeader({ detail, isFavorite, onToggleFavorite }: SchoolHea
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-xl font-black text-[var(--text)]">{detail.schoolName}</h1>
-          <p className="mt-1 text-sm text-[var(--text-muted)]">
-            {detail.officeName} · {detail.schoolType}
-          </p>
+          <div className="mt-1 flex flex-wrap items-center gap-2">
+            <p className="text-sm text-[var(--text-muted)]">{detail.officeName}</p>
+            <Badge variant="neutral" size="sm">
+              {detail.schoolType}
+            </Badge>
+          </div>
         </div>
 
         <div className="flex gap-2">
-          <button
-            type="button"
+          <AppButton
+            variant={isFavorite ? 'danger' : 'secondary'}
             onClick={onToggleFavorite}
             aria-label={isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
             title={isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
-            className={[
-              'inline-flex min-h-9 min-w-9 items-center justify-center rounded-xl border px-2 text-xs font-semibold',
-              isFavorite
-                ? 'border-amber-300 bg-amber-50 text-amber-600'
-                : 'border-[var(--border)] bg-[var(--surface)] text-[var(--text)]',
-            ].join(' ')}
+            leftIcon={<StarIcon className="h-4 w-4" filled={isFavorite} />}
           >
-            <StarIcon className="h-4 w-4" filled={isFavorite} />
-          </button>
+            {isFavorite ? '해제' : '즐겨찾기'}
+          </AppButton>
           <Link
             href="/"
-            className="inline-flex min-h-9 items-center gap-1 rounded-xl bg-[var(--primary)] px-3 py-1.5 text-xs font-semibold text-[var(--primary-contrast)]"
+            className="inline-flex min-h-9 items-center gap-1 rounded-xl bg-[var(--primary)] px-3 py-1.5 text-xs font-semibold text-[var(--primary-contrast)] hover:brightness-95"
           >
             <HomeIcon className="h-4 w-4" />
             홈으로

@@ -8,7 +8,15 @@ import { InfoIcon, MealIcon, TimetableIcon } from '@/components/common/ButtonIco
 export type TabKey = 'info' | 'meal' | 'timetable';
 
 interface TabsProps {
+  /**
+   * 현재 활성 탭 키다.
+   * 해당 값과 일치하는 탭 버튼이 선택 상태로 렌더링된다.
+   */
   activeTab: TabKey;
+  /**
+   * 탭 전환 이벤트 콜백이다.
+   * 클릭 또는 키보드 좌우 이동 시 선택된 탭 키를 전달한다.
+   */
   onChange: (tab: TabKey) => void;
 }
 
