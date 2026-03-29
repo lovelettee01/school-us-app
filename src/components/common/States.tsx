@@ -3,8 +3,20 @@
 import { RetryIcon } from '@/components/common/ButtonIcons';
 
 interface LoadingStateProps {
+  /**
+   * 로딩 상태 제목이다.
+   * 사용자가 현재 어떤 작업을 기다리는지 핵심 맥락을 전달한다.
+   */
   title?: string;
+  /**
+   * 로딩 상태 상세 설명이다.
+   * 작업 단계나 예상 동작을 보조적으로 안내할 때 사용한다.
+   */
   description?: string;
+  /**
+   * 스켈레톤 블록 개수다.
+   * 화면 밀도에 맞춰 로딩 플레이스홀더 수를 조절한다.
+   */
   skeletonCount?: number;
 }
 
@@ -35,8 +47,19 @@ export function LoadingState({
 }
 
 interface ErrorStateProps {
+  /**
+   * 오류 상태 제목이다.
+   * 기본값을 사용하거나 화면 맥락에 맞춰 커스터마이징할 수 있다.
+   */
   title?: string;
+  /**
+   * 사용자에게 노출할 핵심 오류 메시지다.
+   * 필수 값이며 가능한 명확한 행동 가이드를 포함해야 한다.
+   */
   message: string;
+  /**
+   * 재시도 버튼 등 추가 액션 슬롯이다.
+   */
   retry?: ReactNode;
 }
 
@@ -58,8 +81,18 @@ export function ErrorState({ title = '문제가 발생했습니다.', message, r
 }
 
 interface EmptyStateProps {
+  /**
+   * 빈 상태 제목이다.
+   */
   title?: string;
+  /**
+   * 빈 상태 설명 메시지다.
+   * 조회 조건 변경 등 다음 행동을 안내하는 문구를 권장한다.
+   */
   message: string;
+  /**
+   * 빈 상태에서 제공할 선택 액션 영역이다.
+   */
   action?: ReactNode;
 }
 
@@ -81,7 +114,13 @@ export function EmptyState({ title = '조회 결과가 없습니다.', message, 
 }
 
 interface RetryButtonProps {
+  /**
+   * 재시도 클릭 시 실행할 핸들러다.
+   */
   onRetry: () => void;
+  /**
+   * 버튼 라벨 문자열이다.
+   */
   label?: string;
 }
 
