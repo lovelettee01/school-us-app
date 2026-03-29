@@ -1,18 +1,10 @@
-﻿import type { Metadata } from 'next';
-
-import { ComponentGuidePage } from '@/features/component-guide/component-guide-page';
+import { redirect } from 'next/navigation';
 
 /**
- * 컴포넌트 가이드 라우트 메타데이터다.
+ * 기존 컴포넌트 가이드 URL(`/component-guide`) 호환을 위해
+ * 신규 경로(`/guide/components`)로 즉시 리다이렉트한다.
  */
-export const metadata: Metadata = {
-  title: '컴포넌트 가이드',
-  description: '공통 컴포넌트의 시각/행동/Props를 한눈에 확인하고 테스트하는 페이지',
-};
-
-/**
- * `/component-guide` 라우트 엔트리 페이지다.
- */
-export default function ComponentGuideRoutePage() {
-  return <ComponentGuidePage />;
+export default function LegacyComponentGuideRedirectPage() {
+  redirect('/guide/components');
 }
+

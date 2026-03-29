@@ -1,7 +1,8 @@
 ﻿'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { AlertBanner } from '@/components/common/AlertBanner';
 import { Badge } from '@/components/common/Badge';
@@ -20,6 +21,7 @@ import { Tabs, type TabKey } from '@/components/common/Tabs';
 import { AppTextarea } from '@/components/common/Textarea';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
 import { Typography } from '@/components/common/Typography';
+import { GuideTopTabs } from '@/components/guide/GuideTopTabs';
 import { useMessageStore } from '@/store/message-store';
 
 /**
@@ -69,6 +71,13 @@ const GUIDE_MENU_ITEMS: GuideMenuItem[] = [
   { key: 'navigation', label: 'Navigation', description: '탭 네비게이션' },
   { key: 'theme', label: 'Theme', description: '테마/메시지 모드 전환' },
 ];
+
+/**
+ * URL query의 section 값이 유효한 가이드 섹션 키인지 판별한다.
+ */
+function isGuideSectionKey(value: string | null): value is GuideSectionKey {
+  return GUIDE_MENU_ITEMS.some((item) => item.key === value);
+}
 
 interface GuideSectionLayoutProps {
   /**
@@ -249,8 +258,15 @@ function ExampleBlock({ title, feature, usage, children, codeSnippet }: ExampleB
  */
 export function ComponentGuidePage() {
   const pushMessage = useMessageStore((state) => state.pushMessage);
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [activeSection, setActiveSection] = useState<GuideSectionKey>('overview');
+  const activeSection = useMemo<GuideSectionKey>(() => {
+    const section = searchParams.get('section');
+    return isGuideSectionKey(section) ? section : 'overview';
+  }, [searchParams]);
+  const contentTopRef = useRef<HTMLDivElement | null>(null);
   const [buttonVariant, setButtonVariant] = useState<'primary' | 'secondary' | 'ghost' | 'danger'>('primary');
   const [buttonSize, setButtonSize] = useState<'sm' | 'md' | 'lg'>('md');
   const [isButtonLoading, setIsButtonLoading] = useState(false);
@@ -265,6 +281,16 @@ export function ComponentGuidePage() {
   const [radioValue, setRadioValue] = useState('auto');
 
   const [demoTab, setDemoTab] = useState<TabKey>('info');
+
+  const handleSectionChange = (nextSection: GuideSectionKey) => {
+    const nextParams = new URLSearchParams(searchParams.toString());
+    nextParams.set('section', nextSection);
+    router.replace(`${pathname}?${nextParams.toString()}`, { scroll: false });
+  };
+
+  useEffect(() => {
+    contentTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [activeSection]);
 
   const sectionContent = useMemo(() => {
     if (activeSection === 'overview') {
@@ -946,52 +972,56 @@ export function ComponentGuidePage() {
   ]);
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-1 gap-4 px-4 py-6 md:px-6">
-      <aside className="sticky top-4 hidden h-fit w-64 shrink-0 self-start md:block">
-        <nav className="card-surface grid gap-1 p-2" aria-label="컴포넌트 가이드 메뉴">
-          {GUIDE_MENU_ITEMS.map((item) => (
-            <button
-              key={item.key}
-              type="button"
-              onClick={() => setActiveSection(item.key)}
-              className={[
-                'grid rounded-lg px-3 py-2 text-left transition',
-                activeSection === item.key
-                  ? 'bg-[var(--primary)] text-[var(--primary-contrast)]'
-                  : 'text-[var(--text)] hover:bg-[var(--surface-muted)]',
-              ].join(' ')}
-            >
-              <span className="text-sm font-semibold">{item.label}</span>
-              <span className="text-[11px] opacity-85">{item.description}</span>
-            </button>
-          ))}
-        </nav>
-      </aside>
+    <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 py-6 md:px-6">
+      <GuideTopTabs />
 
-      <main className="min-w-0 flex-1">
-        <header className="mb-4 grid gap-2">
-          <Typography as="h1" variant="headline" weight="black">
-            Component Guide
-          </Typography>
-          <Typography tone="muted">
-            공통 컴포넌트의 시각/행동 규칙을 확인하고, Prop 조합을 직접 테스트할 수 있는 가이드 페이지입니다.
-          </Typography>
-          <div className="flex flex-wrap gap-2 md:hidden">
+      <div className="flex min-w-0 flex-1 gap-4">
+        <aside className="sticky top-4 hidden h-fit w-64 shrink-0 self-start md:block">
+          <nav className="card-surface grid gap-1 p-2" aria-label="컴포넌트 가이드 메뉴">
             {GUIDE_MENU_ITEMS.map((item) => (
-              <AppButton
+              <button
                 key={item.key}
-                variant={activeSection === item.key ? 'primary' : 'secondary'}
-                size="sm"
-                onClick={() => setActiveSection(item.key)}
+                type="button"
+                onClick={() => handleSectionChange(item.key)}
+                className={[
+                  'grid rounded-lg px-3 py-2 text-left transition',
+                  activeSection === item.key
+                    ? 'bg-[var(--primary)] text-[var(--primary-contrast)]'
+                    : 'text-[var(--text)] hover:bg-[var(--surface-muted)]',
+                ].join(' ')}
               >
-                {item.label}
-              </AppButton>
+                <span className="text-sm font-semibold">{item.label}</span>
+                <span className="text-[11px] opacity-85">{item.description}</span>
+              </button>
             ))}
-          </div>
-        </header>
+          </nav>
+        </aside>
 
-        <div className="card-surface p-4 md:p-5">{sectionContent}</div>
-      </main>
+        <main className="min-w-0 flex-1">
+          <header className="mb-4 grid gap-2">
+            <Typography as="h1" variant="headline" weight="black">
+              Component Guide
+            </Typography>
+            <Typography tone="muted">
+              공통 컴포넌트의 시각/행동 규칙을 확인하고, Prop 조합을 직접 테스트할 수 있는 가이드 페이지입니다.
+            </Typography>
+            <div className="flex flex-wrap gap-2 md:hidden">
+              {GUIDE_MENU_ITEMS.map((item) => (
+                <AppButton
+                  key={item.key}
+                  variant={activeSection === item.key ? 'primary' : 'secondary'}
+                  size="sm"
+                  onClick={() => handleSectionChange(item.key)}
+                >
+                  {item.label}
+                </AppButton>
+              ))}
+            </div>
+          </header>
+
+          <div ref={contentTopRef} className="card-surface p-4 md:p-5">{sectionContent}</div>
+        </main>
+      </div>
     </div>
   );
 }
